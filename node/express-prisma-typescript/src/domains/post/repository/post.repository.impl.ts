@@ -52,6 +52,36 @@ export class PostRepositoryImpl implements PostRepository {
     return (post != null) ? new PostDTO(post) : null
   }
 
+  async checkPrivateAuthor (authorId: string): Promise<boolean> {
+    const privateAuthor = await this.db.post.findMany({
+      where: {
+        authorId,
+        author: {
+          isPrivate: true
+        }
+      }
+    })
+
+    return privateAuthor.length > 0
+  }
+
+  async notFollowingAuthor (userId: string, authorId: string): Promise<boolean> {
+    const notFollowing = await this.db.post.findMany({
+      where: {
+        authorId,
+        author: {
+          followers: {
+            some: {
+              id: userId
+            }
+          }
+        }
+      }
+    })
+
+    return notFollowing.length > 0
+  }
+
   async getByAuthorId (authorId: string): Promise<PostDTO[]> {
     const posts = await this.db.post.findMany({
       where: {

@@ -34,6 +34,14 @@ export class PostServiceImpl implements PostService {
 
   async getPostsByAuthor (userId: any, authorId: string): Promise<PostDTO[]> {
     // TODO: throw exception when the author has a private profile and the user doesn't follow them
+    // Aca llamaria a la funcion de chequear si el usuario sigue al autor y si su perfil es privado
+    // Puedo hacerlo directamente con prisma.user y prisma.follow pero no se si es lo correcto
+    // Puedo usar metodos estaticos en sus respectivos repositorios
+    // Puedo hacer prisma.post.findMany({where: {authorId: authorId, author: {isPrivate: false}}}) y si no encuentra nada lanzar la excepcion
+    // Para los follos puedo hacer prisma.post.findMany({where: {authorId: authorId, author: {followers: {some: {id: userId}}}}}) y si no encuentra nada lanzar la excepcion
+    const isPrivate = await this.repository.checkPrivateAuthor(authorId)
+    const isFollowing = await this.repository.notFollowingAuthor(userId, authorId)
+    if (isPrivate && !isFollowing) throw new NotFoundException('post')
     return await this.repository.getByAuthorId(authorId)
   }
 }
