@@ -51,5 +51,5 @@ userRouter.put('/private', async (req: Request, res: Response) => {
 
   await service.privateUser(userId)
 
-  return res.status(HttpStatus.OK)
+  return res.status(HttpStatus.OK).send('User is now private')
 })

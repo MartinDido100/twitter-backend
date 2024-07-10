@@ -24,7 +24,7 @@ model User {
   email    String  @unique // Unique constraint
   password String
 
-  isPrivate  Boolean @default(false) // Default value
+  isPrivate Boolean @default(false) // Default value
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -33,6 +33,7 @@ model User {
   posts     Post[]
   follows   Follow[] @relation(name: "follows")
   followers Follow[] @relation(name: "followers")
+  reactions Reaction[]
 }
 
 model Follow {
@@ -60,5 +61,26 @@ model Post {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime? // Optional value
 
+  reactions Reaction[]
+
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade) // One to many
+}
+
+model Reaction{
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  userId String @db.Uuid
+  postId String @db.Uuid
+
+  createdAt DateTime  @default(now())
+  
+  type reactionType
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+enum reactionType {
+  LIKE
+  RETWEET
 }

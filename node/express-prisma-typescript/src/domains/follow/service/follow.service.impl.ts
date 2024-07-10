@@ -1,6 +1,6 @@
 import { ConflictException } from '@utils'
 import { FollowRepositoryImpl } from '../repository'
-import { FollowService } from './follow.service'
+import { FollowService } from '.'
 
 export class FollowServiceImpl implements FollowService {
   constructor (private readonly repository: FollowRepositoryImpl) {}
@@ -16,6 +16,11 @@ export class FollowServiceImpl implements FollowService {
   }
 
   async unfollowUser (userId: string, unfollowUserId: string): Promise<void> {
+    const following = await this.repository.checkFollow(userId, unfollowUserId)
+
+    if (!following) {
+      throw new ConflictException('USER_NOT_FOLLOWED')
+    }
     await this.repository.unfollowUser(userId, unfollowUserId)
   }
 }

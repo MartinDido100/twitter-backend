@@ -36,6 +36,12 @@ export class NotFoundException extends HttpException {
   }
 }
 
+export class UnauthorizedProfileException extends HttpException {
+  constructor () {
+    super(HttpStatus.NOT_FOUND, 'You are not allowed to view this profile')
+  }
+}
+
 export class ConflictException extends HttpException {
   constructor (errorCode?: string) {
     super(HttpStatus.CONFLICT, 'Conflict', { error_code: errorCode })

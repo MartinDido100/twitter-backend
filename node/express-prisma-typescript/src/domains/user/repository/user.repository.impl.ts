@@ -59,6 +59,19 @@ export class UserRepositoryImpl implements UserRepository {
     return user ? new ExtendedUserDTO(user) : null
   }
 
+  async idPrivateUser (userId: any): Promise<boolean> {
+    const user = await this.db.user.findUnique({
+      where: {
+        id: userId
+      },
+      select:{
+        isPrivate: true
+      }
+    })
+
+    return user ? user.isPrivate : false
+  }
+
   async privateUser (userId: any): Promise<void> {
     await this.db.user.update({
       where: {

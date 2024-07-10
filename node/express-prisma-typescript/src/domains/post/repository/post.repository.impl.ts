@@ -18,7 +18,7 @@ export class PostRepositoryImpl implements PostRepository {
     return new PostDTO(post)
   }
 
-  async getAllByDatePaginated (options: CursorPagination): Promise<PostDTO[]> {
+  async getAllByDatePaginated (options: CursorPagination,userId: string): Promise<PostDTO[]> {
     const posts = await this.db.post.findMany({
       cursor: options.after ? { id: options.after } : (options.before) ? { id: options.before } : undefined,
       skip: options.after ?? options.before ? 1 : undefined,
@@ -30,7 +30,26 @@ export class PostRepositoryImpl implements PostRepository {
         {
           id: 'asc'
         }
-      ]
+      ],
+      where: {
+        OR:[
+          {
+            author:{
+              isPrivate: false
+            }
+          },
+          {
+            author:{
+              isPrivate: true,
+              followers:{
+                some:{
+                  followerId: userId
+                }
+              }
+            }
+          }
+        ]
+      }
     })
     return posts.map(post => new PostDTO(post))
   }
@@ -51,37 +70,7 @@ export class PostRepositoryImpl implements PostRepository {
     })
     return (post != null) ? new PostDTO(post) : null
   }
-
-  async checkPrivateAuthor (authorId: string): Promise<boolean> {
-    const privateAuthor = await this.db.post.findMany({
-      where: {
-        authorId,
-        author: {
-          isPrivate: true
-        }
-      }
-    })
-
-    return privateAuthor.length > 0
-  }
-
-  async notFollowingAuthor (userId: string, authorId: string): Promise<boolean> {
-    const notFollowing = await this.db.post.findMany({
-      where: {
-        authorId,
-        author: {
-          followers: {
-            some: {
-              id: userId
-            }
-          }
-        }
-      }
-    })
-
-    return notFollowing.length > 0
-  }
-
+  
   async getByAuthorId (authorId: string): Promise<PostDTO[]> {
     const posts = await this.db.post.findMany({
       where: {
