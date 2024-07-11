@@ -61,9 +61,14 @@ model Post {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime? // Optional value
 
+  postType postType
+
   reactions Reaction[]
 
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade) // One to many
+  parentId  String?   @db.Uuid
+  parent    Post?     @relation("PostComments", fields: [parentId], references: [id])
+  comments  Post[]    @relation("PostComments") // Opposite relation field
 }
 
 model Reaction{
@@ -83,4 +88,9 @@ model Reaction{
 enum reactionType {
   LIKE
   RETWEET
+}
+
+enum postType{
+  POST
+  COMMENT
 }
