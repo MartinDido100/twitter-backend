@@ -21,6 +21,7 @@ export class FollowServiceImpl implements FollowService {
     if (!following) {
       throw new ConflictException('USER_NOT_FOLLOWED')
     }
+
     await this.repository.unfollowUser(userId, unfollowUserId)
   }
 }

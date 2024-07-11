@@ -49,7 +49,8 @@ export class ConflictException extends HttpException {
 }
 
 export function ErrorHandling (error: Error, req: Request, res: Response, next: NextFunction): Response {
-  if (!error) next(error) // TODO: How should I fix EsLint here?
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  if (!error) next(error) // TODO: How should I fix EsLint here? (DONE)
   if (error instanceof HttpException) {
     if (error.code === HttpStatus.INTERNAL_SERVER_ERROR) {
       Logger.error(error.message)

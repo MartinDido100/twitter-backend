@@ -4,6 +4,7 @@ import { CursorPagination } from '@types'
 
 import { PostRepository } from '.'
 import { CreatePostInputDTO, PostDTO } from '../dto'
+import { PostEnum } from '../types'
 
 export class PostRepositoryImpl implements PostRepository {
   constructor (private readonly db: PrismaClient) {}
@@ -12,15 +13,16 @@ export class PostRepositoryImpl implements PostRepository {
     const post = await this.db.post.create({
       data: {
         authorId: userId,
+        postType: PostEnum.POST,
         ...data
       }
     })
     return new PostDTO(post)
   }
 
-  async getAllByDatePaginated (options: CursorPagination,userId: string): Promise<PostDTO[]> {
+  async getAllByDatePaginated (options: CursorPagination, userId: string): Promise<PostDTO[]> {
     const posts = await this.db.post.findMany({
-      cursor: options.after ? { id: options.after } : (options.before) ? { id: options.before } : undefined,
+      cursor: options.after ? { id: options.after } : options.before ? { id: options.before } : undefined,
       skip: options.after ?? options.before ? 1 : undefined,
       take: options.limit ? (options.before ? -options.limit : options.limit) : undefined,
       orderBy: [
@@ -32,26 +34,33 @@ export class PostRepositoryImpl implements PostRepository {
         }
       ],
       where: {
-        OR:[
+        AND: [
           {
-            author:{
-              isPrivate: false
-            }
-          },
-          {
-            author:{
-              isPrivate: true,
-              followers:{
-                some:{
-                  followerId: userId
+            OR: [
+              {
+                author: {
+                  isPrivate: false
+                }
+              },
+              {
+                author: {
+                  isPrivate: true,
+                  followers: {
+                    some: {
+                      followerId: userId
+                    }
+                  }
                 }
               }
-            }
+            ]
+          },
+          {
+            postType: PostEnum.POST
           }
         ]
       }
     })
-    return posts.map(post => new PostDTO(post))
+    return posts.map((post) => new PostDTO(post))
   }
 
   async delete (postId: string): Promise<void> {
@@ -68,15 +77,15 @@ export class PostRepositoryImpl implements PostRepository {
         id: postId
       }
     })
-    return (post != null) ? new PostDTO(post) : null
+    return post != null ? new PostDTO(post) : null
   }
-  
+
   async getByAuthorId (authorId: string): Promise<PostDTO[]> {
     const posts = await this.db.post.findMany({
       where: {
         authorId
       }
     })
-    return posts.map(post => new PostDTO(post))
+    return posts.map((post) => new PostDTO(post))
   }
 }

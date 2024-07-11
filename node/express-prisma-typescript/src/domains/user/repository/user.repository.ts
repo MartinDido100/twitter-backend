@@ -9,5 +9,6 @@ export interface UserRepository {
   getById: (userId: string) => Promise<UserDTO | null>
   getByEmailOrUsername: (email?: string, username?: string) => Promise<ExtendedUserDTO | null>
   privateUser: (userId: string) => Promise<void>
+  unprivateUser: (userId: string) => Promise<void>
   idPrivateUser: (userId: string) => Promise<boolean>
 }

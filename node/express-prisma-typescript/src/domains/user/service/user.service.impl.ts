@@ -25,4 +25,8 @@ export class UserServiceImpl implements UserService {
   async privateUser (userId: any): Promise<void> {
     await this.repository.privateUser(userId)
   }
+
+  async unprivateUser (userId: any): Promise<void> {
+    await this.repository.unprivateUser(userId)
+  }
 }

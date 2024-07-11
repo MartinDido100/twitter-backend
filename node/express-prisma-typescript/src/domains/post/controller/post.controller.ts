@@ -14,7 +14,11 @@ import { UserRepositoryImpl } from '@domains/user/repository'
 export const postRouter = Router()
 
 // Use dependency injection
-const service: PostService = new PostServiceImpl(new PostRepositoryImpl(db),new FollowRepositoryImpl(db),new UserRepositoryImpl(db))
+const service: PostService = new PostServiceImpl(
+  new PostRepositoryImpl(db),
+  new FollowRepositoryImpl(db),
+  new UserRepositoryImpl(db)
+)
 
 postRouter.get('/', async (req: Request, res: Response) => {
   const { userId } = res.locals.context

@@ -64,7 +64,7 @@ export class UserRepositoryImpl implements UserRepository {
       where: {
         id: userId
       },
-      select:{
+      select: {
         isPrivate: true
       }
     })
@@ -79,6 +79,17 @@ export class UserRepositoryImpl implements UserRepository {
       },
       data: {
         isPrivate: true
+      }
+    })
+  }
+
+  async unprivateUser (userId: any): Promise<void> {
+    await this.db.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        isPrivate: false
       }
     })
   }

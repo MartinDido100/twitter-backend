@@ -11,7 +11,7 @@ export class FollowRepositoryImpl implements FollowRepository {
         followerId: userId
       }
     })
-    console.log(followUserId,userId)
+    console.log(followUserId, userId)
     return follow !== null
   }
 
@@ -26,9 +26,9 @@ export class FollowRepositoryImpl implements FollowRepository {
 
   async unfollowUser (userId: string, unfollowUserId: string): Promise<void> {
     await this.db.follow.deleteMany({
-      where: { 
-          followedId: unfollowUserId,
-          followerId: userId
+      where: {
+        followedId: unfollowUserId,
+        followerId: userId
       }
     })
   }

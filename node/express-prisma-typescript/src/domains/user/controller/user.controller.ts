@@ -46,6 +46,14 @@ userRouter.delete('/', async (req: Request, res: Response) => {
   return res.status(HttpStatus.OK)
 })
 
+userRouter.put('/unprivate', async (req: Request, res: Response) => {
+  const { userId } = res.locals.context
+
+  await service.unprivateUser(userId)
+
+  return res.status(HttpStatus.OK).send('User is now private')
+})
+
 userRouter.put('/private', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
 

@@ -31,8 +31,8 @@ model User {
   deletedAt DateTime? // Optional value
 
   posts     Post[]
-  follows   Follow[] @relation(name: "follows")
-  followers Follow[] @relation(name: "followers")
+  follows   Follow[]   @relation(name: "follows")
+  followers Follow[]   @relation(name: "followers")
   reactions Reaction[]
 }
 
@@ -66,19 +66,20 @@ model Post {
   reactions Reaction[]
 
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade) // One to many
-  parentId  String?   @db.Uuid
-  parent    Post?     @relation("PostComments", fields: [parentId], references: [id])
-  comments  Post[]    @relation("PostComments") // Opposite relation field
+
+  parentId String? @db.Uuid
+  parent   Post?   @relation("comments", fields: [parentId], references: [id])
+  comments Post[]  @relation("comments")
 }
 
-model Reaction{
+model Reaction {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
   userId String @db.Uuid
   postId String @db.Uuid
 
-  createdAt DateTime  @default(now())
-  
+  createdAt DateTime @default(now())
+
   type reactionType
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -90,7 +91,7 @@ enum reactionType {
   RETWEET
 }
 
-enum postType{
+enum postType {
   POST
   COMMENT
 }
