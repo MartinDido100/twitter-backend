@@ -136,8 +136,8 @@ Fork this repository and complete the tasks. Then create a PR and start with you
 - [x] Add the ability to comment in posts, a comment should be stored as a post, but still be able to query posts and comments separately.
 - [x] Create endpoints to query retweets, likes and comments by user id and put them in their respective domains.
 - [ ] Users do not currently have a profile picture. Integrate with AWS S3 to store user profile pictures and post pictures. Careful! Do not receive images in your endpoints. Make use of S3 Pre-signed URLs. Update the UserDTO to include the profile image. You can use a public S3 bucket as it doesn't contain private data.
-- [ ] Update  `GET api/user/me` and `GET api/user`  to return `UserViewDTO`.
-- [ ] Create endpoint `GET api/comment/:post_id` to get comments by post. Add Cursor Based Pagination (You can see how it works [here](./src/types/index.ts)). It should return `ExtendedPostDTO` and sorted by reactions.
+- [x] Update  `GET api/user/me` and `GET api/user`  to return `UserViewDTO`.
+- [x] Create endpoint `GET api/comment/:post_id` to get comments by post. Add Cursor Based Pagination (You can see how it works [here](./src/types/index.ts)). It should return `ExtendedPostDTO` and sorted by reactions.
 - [ ] Create endpoint `GET api/user/by_username/:username` to return a list of `UserViewDTO`  of those users whose usernames are included in `:username`. Add pagination.
 - [ ] Update `GET api/post` and `GET api/post/by_user/:user_id` to return a list of `ExtendedPostDTO`.
 - [ ] Update `GET api/user/:user_id` to return `UserViewDTO`. Also return if the user follows the one making the request.
