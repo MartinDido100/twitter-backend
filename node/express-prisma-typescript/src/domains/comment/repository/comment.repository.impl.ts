@@ -1,8 +1,10 @@
 import { PrismaClient } from '@prisma/client'
-import { CommentDTO } from '../dto'
+import { CommentDTO, ExtendedCommentDTO } from '../dto'
 import { CommentRepository } from '.'
 import { CreatePostInputDTO } from '@domains/post/dto'
 import { PostEnum } from '@domains/post/types'
+import { CursorPagination } from '@types'
+import { ReactionEnum } from '@domains/reaction/dto'
 
 export class CommentRepositoryImpl implements CommentRepository {
   constructor (private readonly db: PrismaClient) {}
@@ -28,5 +30,42 @@ export class CommentRepositoryImpl implements CommentRepository {
     })
 
     return comments.map((comment) => new CommentDTO(comment))
+  }
+
+  async getCommentsByPost (postId: string, options: CursorPagination): Promise<ExtendedCommentDTO[]> {
+    const comments = await this.db.post.findMany({
+      cursor: options.after ? { id: options.after } : options.before ? { id: options.before } : undefined,
+      skip: options.after ?? options.before ? 1 : undefined,
+      take: options.limit ? (options.before ? -options.limit : options.limit) : undefined,
+      where: {
+        parentId: postId,
+        postType: PostEnum.COMMENT
+      },
+      include: {
+        reactions: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            username: true
+          }
+        }
+      },
+      orderBy: [
+        {
+          reactions: {
+            _count: 'desc'
+          }
+        },
+        {
+          id: 'asc'
+        }
+      ]
+    })
+    return comments.map((comment) => {
+      const qtyLikes = comment.reactions.filter((reaction) => reaction.type === ReactionEnum.LIKE).length
+      const qtyRetweets = comment.reactions.filter((reaction) => reaction.type === ReactionEnum.RETWEET).length
+      return new ExtendedCommentDTO({ ...comment, qtyLikes, qtyRetweets })
+    })
   }
 }

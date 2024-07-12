@@ -12,6 +12,13 @@ export class PostServiceImpl implements PostService {
     , private readonly followRepo: FollowRepository
     , private readonly userRepo: UserRepository) {}
 
+  private async validateAuthor (userId: string, authorId: string): Promise<boolean> {
+    const isFollowing = await this.followRepo.checkFollow(userId, authorId)
+    const isPrivate = await this.userRepo.isPrivateUser(authorId)
+
+    return !isPrivate || isFollowing
+  }
+
   async createPost (userId: string, data: CreatePostInputDTO): Promise<PostDTO> {
     await validate(data)
     return await this.repository.create(userId, data)
@@ -28,9 +35,9 @@ export class PostServiceImpl implements PostService {
     // TODO: validate that the author has public profile or the user follows the author (DONE)
     const post = await this.repository.getById(postId)
     if (!post) throw new NotFoundException('post')
-    const isFollowing = await this.followRepo.checkFollow(userId, post.authorId)
-    const isPrivate = await this.userRepo.idPrivateUser(post.authorId)
-    if (isPrivate || !isFollowing) throw new UnauthorizedProfileException()
+
+    const accesiblePost = await this.validateAuthor(userId, post.authorId)
+    if (!accesiblePost) throw new UnauthorizedProfileException()
 
     return post
   }
@@ -42,10 +49,8 @@ export class PostServiceImpl implements PostService {
 
   async getPostsByAuthor (userId: any, authorId: string): Promise<PostDTO[]> {
     // TODO: throw exception when the author has a private profile and the user doesn't follow them (DONE)
-    const isFollowing = await this.followRepo.checkFollow(userId, authorId)
-    const isPrivate = await this.userRepo.idPrivateUser(authorId)
-    console.log(isFollowing, isPrivate)
-    if (isPrivate || !isFollowing) throw new UnauthorizedProfileException()
+    const accesibleAuthor = await this.validateAuthor(userId, authorId)
+    if (!accesibleAuthor) throw new UnauthorizedProfileException()
     return await this.repository.getByAuthorId(authorId)
   }
 }
