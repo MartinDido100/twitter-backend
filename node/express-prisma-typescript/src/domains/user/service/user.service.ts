@@ -7,4 +7,5 @@ export interface UserService {
   getUserRecommendations: (userId: any, options: OffsetPagination) => Promise<UserViewDTO[]>
   privateUser: (userId: any) => Promise<void>
   unprivateUser: (userId: any) => Promise<void>
+  updateProfilePicture: (userId: string, extension: string) => Promise<string>
 }

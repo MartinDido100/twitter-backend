@@ -47,7 +47,8 @@ export class CommentRepositoryImpl implements CommentRepository {
           select: {
             id: true,
             name: true,
-            username: true
+            username: true,
+            profilePicture: true
           }
         }
       },

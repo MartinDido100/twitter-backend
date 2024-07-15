@@ -16,7 +16,7 @@ export class UserRepositoryImpl implements UserRepository {
       }
     })
 
-    return user
+    return new UserDTO(user)
   }
 
   async getById (userId: any): Promise<UserViewDTO | null> {
@@ -36,7 +36,20 @@ export class UserRepositoryImpl implements UserRepository {
     })
   }
 
-  async getRecommendedUsersPaginated (options: OffsetPagination): Promise<UserViewDTO[]> {
+  async getRecommendedUsersPaginated (userId: string, options: OffsetPagination): Promise<UserViewDTO[]> {
+    const following = await this.db.user.findMany({
+      where: {
+        followers: {
+          some: {
+            id: userId
+          }
+        }
+      },
+      select: {
+        id: true
+      }
+    })
+
     const users = await this.db.user.findMany({
       take: options.limit ? options.limit : undefined,
       skip: options.skip ? options.skip : undefined,
@@ -44,8 +57,18 @@ export class UserRepositoryImpl implements UserRepository {
         {
           id: 'asc'
         }
-      ]
+      ],
+      where: {
+        followers: {
+          some: {
+            id: {
+              in: following.map(user => user.id)
+            }
+          }
+        }
+      }
     })
+
     return users.map(user => new UserViewDTO(user))
   }
 
@@ -96,6 +119,17 @@ export class UserRepositoryImpl implements UserRepository {
       },
       data: {
         isPrivate: false
+      }
+    })
+  }
+
+  async updateProfilePicture (userId: string, extension: string): Promise <UserDTO> {
+    return await this.db.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        profilePicture: `profile/${userId}.${extension}`
       }
     })
   }

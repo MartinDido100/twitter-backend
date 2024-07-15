@@ -28,4 +28,12 @@ export class Constants {
 
   // Authentication secret
   static TOKEN_SECRET: string = process.env.TOKEN_SECRET ?? 'secret'
+
+  static S3_BUCKET: string = process.env.S3_BUCKET ?? ''
+
+  static S3_REGION: string = process.env.S3_REGION ?? ''
+
+  static AWS_ACCESS_KEY_ID: string = process.env.AWS_ACCESS_KEY_ID ?? ''
+
+  static AWS_SECRET_ACCESS_KEY: string = process.env.AWS_SECRET_ACCESS_KEY ?? ''
 }
