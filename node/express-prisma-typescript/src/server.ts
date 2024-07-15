@@ -16,7 +16,7 @@ if (Constants.NODE_ENV === NodeEnv.DEV) {
 
 // Set up request parsers
 app.use(express.json()) // Parses application/json payloads request bodies
-app.use(express.urlencoded({ extended: false })) // Parse application/x-www-form-urlencoded request bodies
+app.use(express.urlencoded({ extended: true })) // Parse application/x-www-form-urlencoded request bodies
 app.use(cookieParser()) // Parse cookies
 
 // Set up CORS

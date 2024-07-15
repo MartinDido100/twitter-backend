@@ -3,15 +3,17 @@ import HttpStatus from 'http-status'
 // express-async-errors is a module that handles async errors in express, don't forget import it in your new controllers
 import 'express-async-errors'
 
-import { db } from '@utils'
+import { db, InvalidExtensionException, s3 } from '@utils'
 
 import { UserRepositoryImpl } from '../repository'
 import { UserService, UserServiceImpl } from '../service'
+import { BucketManager } from '@utils/s3bucket'
+import { AllowedExtensions } from '../dto'
 
 export const userRouter = Router()
 
 // Use dependency injection
-const service: UserService = new UserServiceImpl(new UserRepositoryImpl(db))
+const service: UserService = new UserServiceImpl(new UserRepositoryImpl(db), new BucketManager(s3))
 
 userRouter.get('/', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
@@ -44,6 +46,20 @@ userRouter.delete('/', async (req: Request, res: Response) => {
   await service.deleteUser(userId)
 
   return res.status(HttpStatus.OK)
+})
+
+userRouter.put('/profile', async (req: Request, res: Response) => {
+  const { userId } = res.locals.context
+
+  const { extension } = req.query as Record<string, AllowedExtensions>
+
+  if (![AllowedExtensions.PNG, AllowedExtensions.JPG, AllowedExtensions.JPEG].includes(extension)) {
+    throw new InvalidExtensionException()
+  }
+
+  const uploadUrl = await service.updateProfilePicture(userId, extension)
+
+  return res.status(HttpStatus.OK).json({ uploadUrl })
 })
 
 userRouter.put('/unprivate', async (req: Request, res: Response) => {

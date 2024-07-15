@@ -3,11 +3,13 @@ export class UserDTO {
     this.id = user.id
     this.name = user.name
     this.createdAt = user.createdAt
+    this.profilePicture = user.profilePicture
   }
 
   id: string
   name: string | null
   createdAt: Date
+  profilePicture: string | null
 }
 
 export class ExtendedUserDTO extends UserDTO {
@@ -28,11 +30,17 @@ export class UserViewDTO {
     this.id = user.id
     this.name = user.name
     this.username = user.username
-    // this.profilePicture = user.profilePicture
+    this.profilePicture = user.profilePicture
   }
 
   id: string
   name: string | null
   username: string
-  // profilePicture: string | null
+  profilePicture: string | null
+}
+
+export enum AllowedExtensions {
+  PNG = 'png',
+  JPG = 'jpg',
+  JPEG = 'jpeg'
 }
