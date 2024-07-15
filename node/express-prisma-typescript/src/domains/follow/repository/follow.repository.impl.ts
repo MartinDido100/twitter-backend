@@ -11,7 +11,6 @@ export class FollowRepositoryImpl implements FollowRepository {
         followerId: userId
       }
     })
-    console.log(followUserId, userId)
     return follow !== null
   }
 
