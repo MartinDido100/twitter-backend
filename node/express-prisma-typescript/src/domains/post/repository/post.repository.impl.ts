@@ -14,9 +14,11 @@ export class PostRepositoryImpl implements PostRepository {
       data: {
         authorId: userId,
         postType: PostEnum.POST,
-        ...data
+        ...data,
+        images: data.images?.map((image, index) => `postImages/${userId}/${Date.now()}${index}${image}`)
       }
     })
+
     return new PostDTO(post)
   }
 

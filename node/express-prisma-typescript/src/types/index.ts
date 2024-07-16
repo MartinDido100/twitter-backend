@@ -1,18 +1,5 @@
 export type ClassType<T> = new (...args: any[]) => T
 
-/**
- * @typedef CursorPagination
- *
- * @description Cursor-Based Pagination or Keyset Pagination
- *
- * Read more about Cursor Pagination https://jsonapi.org/profiles/ethanresnick/cursor-pagination/
- *
- * Either before or after should be defined, not both at the same time
- *
- * @property {number} limit - The amount of records to return
- * @property {string} before - The id of the record after the last returned record
- * @property {string} after - The id of the record before the first returned record
- */
 export interface CursorPagination {
   limit?: number
   before?: string

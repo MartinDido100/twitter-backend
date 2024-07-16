@@ -1,5 +1,5 @@
 import { NotFoundException } from '@utils/errors'
-import { OffsetPagination } from 'types'
+import { CursorPagination, OffsetPagination } from 'types'
 import { UserViewDTO } from '../dto'
 import { UserRepository } from '../repository'
 import { UserService } from './user.service'
@@ -24,12 +24,12 @@ export class UserServiceImpl implements UserService {
   }
 
   async getUserRecommendations (userId: any, options: OffsetPagination): Promise<UserViewDTO[]> {
-    // TODO: make this return only users followed by users the original user follows
+    // TODO: make this return only users followed by users the original user follows (DONE)
     const users = await this.repository.getRecommendedUsersPaginated(userId, options)
 
     for (const user of users) {
       if (user.profilePicture) {
-        user.profilePicture = await this.bucketManager.getImage(user.profilePicture)
+        user.profilePicture = await this.getProfilePicture(user.profilePicture)
       }
     }
 
@@ -52,5 +52,17 @@ export class UserServiceImpl implements UserService {
     const user = await this.repository.updateProfilePicture(userId, extension)
 
     return await this.bucketManager.putImage(user.profilePicture ?? '')
+  }
+
+  async getUserByUsername (username: string, options: CursorPagination): Promise<UserViewDTO[]> {
+    const users = await this.repository.getByUsername(username, options)
+
+    for (const user of users) {
+      if (user.profilePicture) {
+        user.profilePicture = await this.getProfilePicture(user.profilePicture)
+      }
+    }
+
+    return users
   }
 }

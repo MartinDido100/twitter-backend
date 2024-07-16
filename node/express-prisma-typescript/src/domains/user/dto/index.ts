@@ -36,13 +36,10 @@ export class UserViewDTO {
   name: string | null
   username: string
   profilePicture: string | null
-<<<<<<< HEAD
-=======
 }
 
 export enum AllowedExtensions {
   PNG = 'png',
   JPG = 'jpg',
   JPEG = 'jpeg'
->>>>>>> b64a392c9b451872cb436be13a1a563b58fa2e1d
 }

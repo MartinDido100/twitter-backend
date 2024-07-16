@@ -4,6 +4,8 @@ import { FollowRepositoryImpl } from '../repository'
 import { db } from '@utils'
 import HttpStatus from 'http-status'
 
+import 'express-async-errors'
+
 export const followerRouter = Router()
 
 const service = new FollowServiceImpl(new FollowRepositoryImpl(db))

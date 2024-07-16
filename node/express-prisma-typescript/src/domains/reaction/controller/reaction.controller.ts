@@ -4,6 +4,8 @@ import { ReactionServiceImpl } from '../service'
 import { ReactionRepositoryImpl } from '../repository'
 import httpStatus from 'http-status'
 
+import 'express-async-errors'
+
 export const reactionRouter = Router()
 
 const reactionService = new ReactionServiceImpl(new ReactionRepositoryImpl(db))

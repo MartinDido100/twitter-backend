@@ -3,13 +3,14 @@ import HttpStatus from 'http-status'
 // express-async-errors is a module that handles async errors in express, don't forget import it in your new controllers
 import 'express-async-errors'
 
-import { db, BodyValidation } from '@utils'
+import { db, BodyValidation, s3, imagesExtensionValidation } from '@utils'
 
 import { PostRepositoryImpl } from '../repository'
 import { PostService, PostServiceImpl } from '../service'
 import { CreatePostInputDTO } from '../dto'
 import { FollowRepositoryImpl } from '@domains/follow/repository'
 import { UserRepositoryImpl } from '@domains/user/repository'
+import { BucketManager } from '@utils/s3bucket'
 
 export const postRouter = Router()
 
@@ -17,7 +18,8 @@ export const postRouter = Router()
 const service: PostService = new PostServiceImpl(
   new PostRepositoryImpl(db),
   new FollowRepositoryImpl(db),
-  new UserRepositoryImpl(db)
+  new UserRepositoryImpl(db),
+  new BucketManager(s3)
 )
 
 postRouter.get('/', async (req: Request, res: Response) => {
@@ -47,7 +49,7 @@ postRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
   return res.status(HttpStatus.OK).json(posts)
 })
 
-postRouter.post('/', BodyValidation(CreatePostInputDTO), async (req: Request, res: Response) => {
+postRouter.post('/', BodyValidation(CreatePostInputDTO), imagesExtensionValidation(), async (req: Request, res: Response) => {
   const { userId } = res.locals.context
   const data = req.body
 

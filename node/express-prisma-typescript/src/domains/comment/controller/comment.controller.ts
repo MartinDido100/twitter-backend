@@ -8,6 +8,8 @@ import { PostRepositoryImpl } from '@domains/post/repository'
 import { UserRepositoryImpl } from '@domains/user/repository'
 import { FollowRepositoryImpl } from '@domains/follow/repository'
 
+import 'express-async-errors'
+
 export const commentRouter = Router()
 
 const commentService = new CommentServiceImpl(

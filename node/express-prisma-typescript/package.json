@@ -13,8 +13,7 @@
     "db:generate": "prisma generate"
   },
   "prisma": {
-    "schema": "./prisma/schema.prisma",
-    "seed": "ts-node prisma/seed.ts"
+    "schema": "./prisma/schema.prisma"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.614.0",
@@ -33,7 +32,6 @@
     "jsonwebtoken": "^9.0.0",
     "method-override": "^3.0.0",
     "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1",
     "prisma": "^5.16.2",
     "signale": "^1.4.0"
   },
