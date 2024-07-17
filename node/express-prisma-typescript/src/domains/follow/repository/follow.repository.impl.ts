@@ -4,11 +4,11 @@ import { FollowRepository } from '.'
 export class FollowRepositoryImpl implements FollowRepository {
   constructor (private readonly db: PrismaClient) {}
 
-  async checkFollow (userId: string, followUserId: string): Promise<boolean> {
+  async checkFollow (followerId: string, followedId: string): Promise<boolean> {
     const follow = await this.db.follow.findFirst({
       where: {
-        followedId: followUserId,
-        followerId: userId
+        followedId,
+        followerId
       }
     })
     return follow !== null

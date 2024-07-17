@@ -3,8 +3,9 @@ import { PrismaClient } from '@prisma/client'
 import { CursorPagination } from '@types'
 
 import { PostRepository } from '.'
-import { CreatePostInputDTO, PostDTO } from '../dto'
+import { CreatePostInputDTO, ExtendedPostDTO, PostDTO } from '../dto'
 import { PostEnum } from '../types'
+import { ReactionEnum } from '@domains/reaction/dto'
 
 export class PostRepositoryImpl implements PostRepository {
   constructor (private readonly db: PrismaClient) {}
@@ -22,7 +23,7 @@ export class PostRepositoryImpl implements PostRepository {
     return new PostDTO(post)
   }
 
-  async getAllByDatePaginated (options: CursorPagination, userId: string): Promise<PostDTO[]> {
+  async getAllByDatePaginated (options: CursorPagination, userId: string): Promise<ExtendedPostDTO[]> {
     const posts = await this.db.post.findMany({
       cursor: options.after ? { id: options.after } : options.before ? { id: options.before } : undefined,
       skip: options.after ?? options.before ? 1 : undefined,
@@ -35,6 +36,18 @@ export class PostRepositoryImpl implements PostRepository {
           id: 'asc'
         }
       ],
+      include: {
+        reactions: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            profilePicture: true
+          }
+        },
+        comments: true
+      },
       where: {
         AND: [
           {
@@ -62,7 +75,13 @@ export class PostRepositoryImpl implements PostRepository {
         ]
       }
     })
-    return posts.map((post) => new PostDTO(post))
+
+    return posts.map((post) => {
+      const qtyLikes = post.reactions.filter((reaction) => reaction.type === ReactionEnum.LIKE).length
+      const qtyRetweets = post.reactions.filter((reaction) => reaction.type === ReactionEnum.RETWEET).length
+      const qtyComments = post.comments.length
+      return new ExtendedPostDTO({ ...post, qtyLikes, qtyRetweets, qtyComments })
+    })
   }
 
   async delete (postId: string): Promise<void> {
@@ -82,12 +101,30 @@ export class PostRepositoryImpl implements PostRepository {
     return post != null ? new PostDTO(post) : null
   }
 
-  async getByAuthorId (authorId: string): Promise<PostDTO[]> {
+  async getByAuthorId (authorId: string): Promise<ExtendedPostDTO[]> {
     const posts = await this.db.post.findMany({
       where: {
         authorId
+      },
+      include: {
+        reactions: true,
+        comments: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            profilePicture: true
+          }
+        }
       }
     })
-    return posts.map((post) => new PostDTO(post))
+
+    return posts.map((post) => {
+      const qtyLikes = post.reactions.filter((reaction) => reaction.type === ReactionEnum.LIKE).length
+      const qtyRetweets = post.reactions.filter((reaction) => reaction.type === ReactionEnum.RETWEET).length
+      const qtyComments = post.comments.length
+      return new ExtendedPostDTO({ ...post, qtyLikes, qtyRetweets, qtyComments })
+    })
   }
 }

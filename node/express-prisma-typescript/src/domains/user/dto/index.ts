@@ -38,6 +38,15 @@ export class UserViewDTO {
   profilePicture: string | null
 }
 
+export class ExtendedUserViewDTO extends UserViewDTO {
+  constructor (user: ExtendedUserViewDTO) {
+    super(user)
+    this.followsYou = user.followsYou
+  }
+
+  followsYou!: boolean
+}
+
 export enum AllowedExtensions {
   PNG = 'png',
   JPG = 'jpg',

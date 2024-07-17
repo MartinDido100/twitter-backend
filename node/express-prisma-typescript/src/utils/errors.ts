@@ -54,8 +54,7 @@ export class ConflictException extends HttpException {
   }
 }
 
-export function ErrorHandling (error: Error, req: Request, res: Response, next: NextFunction): Response {
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+export function ErrorHandling (error: Error | null, req: Request, res: Response, next: NextFunction): Response {
   if (!error) next(error) // TODO: How should I fix EsLint here? (DONE)
   if (error instanceof HttpException) {
     if (error.code === HttpStatus.INTERNAL_SERVER_ERROR) {
@@ -63,6 +62,6 @@ export function ErrorHandling (error: Error, req: Request, res: Response, next: 
     }
     return res.status(error.code).json({ message: error.message, code: error.code, errors: error.error })
   }
-  Logger.error(error.message)
-  return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message, code: 500 })
+  Logger.error(error?.message)
+  return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error?.message, code: 500 })
 }

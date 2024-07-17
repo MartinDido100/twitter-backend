@@ -1,18 +1,22 @@
 import { NotFoundException } from '@utils/errors'
 import { CursorPagination, OffsetPagination } from 'types'
-import { UserViewDTO } from '../dto'
+import { ExtendedUserViewDTO, UserViewDTO } from '../dto'
 import { UserRepository } from '../repository'
 import { UserService } from './user.service'
 import { BucketManager } from '@utils/s3bucket'
+import { FollowRepository } from '../../follow/repository/follow.repository'
 
 export class UserServiceImpl implements UserService {
-  constructor (private readonly repository: UserRepository, private readonly bucketManager: BucketManager) {}
+  constructor (
+    private readonly repository: UserRepository,
+    private readonly bucketManager: BucketManager,
+    private readonly followRepo: FollowRepository) {}
 
   private async getProfilePicture (picturePath: string): Promise<string> {
     return await this.bucketManager.getImage(picturePath)
   }
 
-  async getUser (userId: string): Promise<UserViewDTO> {
+  async getLoggedUser (userId: string): Promise<UserViewDTO> {
     const user = await this.repository.getById(userId)
     if (!user) throw new NotFoundException('user')
 
@@ -23,14 +27,25 @@ export class UserServiceImpl implements UserService {
     return user
   }
 
+  async getUser (loggedUserId: string, otherUserId: string): Promise<ExtendedUserViewDTO> {
+    const user = await this.repository.getById(otherUserId)
+    if (!user) throw new NotFoundException('user')
+
+    if (user.profilePicture) {
+      user.profilePicture = await this.bucketManager.getImage(user.profilePicture)
+    }
+
+    const followsYou = await this.followRepo.checkFollow(otherUserId, loggedUserId)
+
+    return new ExtendedUserViewDTO({ ...user, followsYou })
+  }
+
   async getUserRecommendations (userId: any, options: OffsetPagination): Promise<UserViewDTO[]> {
     // TODO: make this return only users followed by users the original user follows (DONE)
     const users = await this.repository.getRecommendedUsersPaginated(userId, options)
 
     for (const user of users) {
-      if (user.profilePicture) {
-        user.profilePicture = await this.getProfilePicture(user.profilePicture)
-      }
+      user.profilePicture = user.profilePicture ? await this.getProfilePicture(user.profilePicture) : null
     }
 
     return users
@@ -58,9 +73,7 @@ export class UserServiceImpl implements UserService {
     const users = await this.repository.getByUsername(username, options)
 
     for (const user of users) {
-      if (user.profilePicture) {
-        user.profilePicture = await this.getProfilePicture(user.profilePicture)
-      }
+      user.profilePicture = user.profilePicture ? await this.getProfilePicture(user.profilePicture) : null
     }
 
     return users

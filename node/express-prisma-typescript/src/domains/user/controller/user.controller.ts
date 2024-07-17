@@ -9,11 +9,12 @@ import { UserRepositoryImpl } from '../repository'
 import { UserService, UserServiceImpl } from '../service'
 import { BucketManager } from '@utils/s3bucket'
 import { AllowedExtensions } from '../dto'
+import { FollowRepositoryImpl } from '@domains/follow/repository'
 
 export const userRouter = Router()
 
 // Use dependency injection
-const service: UserService = new UserServiceImpl(new UserRepositoryImpl(db), new BucketManager(s3))
+const service: UserService = new UserServiceImpl(new UserRepositoryImpl(db), new BucketManager(s3), new FollowRepositoryImpl(db))
 
 userRouter.get('/', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
@@ -27,15 +28,16 @@ userRouter.get('/', async (req: Request, res: Response) => {
 userRouter.get('/me', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
 
-  const user = await service.getUser(userId)
+  const user = await service.getLoggedUser(userId)
 
   return res.status(HttpStatus.OK).json(user)
 })
 
 userRouter.get('/:userId', async (req: Request, res: Response) => {
   const { userId: otherUserId } = req.params
+  const { userId } = res.locals.context
 
-  const user = await service.getUser(otherUserId)
+  const user = await service.getUser(userId, otherUserId)
 
   return res.status(HttpStatus.OK).json(user)
 })

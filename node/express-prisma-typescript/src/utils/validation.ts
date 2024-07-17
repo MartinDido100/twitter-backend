@@ -20,7 +20,7 @@ export function BodyValidation<T> (target: ClassType<T>) {
 
 export function imagesExtensionValidation () {
   return (req: Request, res: Response, next: NextFunction) => {
-    const regExp = /\.(jpg|jpeg|png)$/
+    const regExp = /\.(jpg|jpeg|png)$/i
     req.body.images?.forEach((image: string) => {
       if (!regExp.test(image)) throw new ValidationException([{ message: 'File extension not allowed', property: 'images' }])
     })
