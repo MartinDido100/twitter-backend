@@ -5,6 +5,18 @@ import 'express-async-errors'
 
 export const healthRouter = Router()
 
+/**
+ * @openapi
+ *
+ * /health:
+ *   get:
+ *     summary: Checks the server health.
+ *     tags:
+ *       - Health
+ *     responses:
+ *       200:
+ *         description: Server is healthy.
+ */
 healthRouter.get('/', (req: Request, res: Response) => {
   return res.status(HttpStatus.OK).send()
 })

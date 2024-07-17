@@ -33,16 +33,16 @@ export class CommentServiceImpl implements CommentService {
   }
 
   async getCommentsByUser (userId: string): Promise<CommentDTO[]> {
-    const isPrivate = await this.userRepo.isPrivateUser(userId)
-    if (isPrivate) throw new UnauthorizedProfileException()
+    const accesibleUser = await this.userRepo.isPrivateUser(userId)
+    if (!accesibleUser) throw new UnauthorizedProfileException()
     return await this.repository.getCommentsByUser(userId)
   }
 
   async getCommentsByPost (postId: string, options: CursorPagination): Promise<CommentDTO[]> {
     const post = await this.postRepo.getById(postId)
     if (!post) throw new NotFoundException('post')
-    const isPrivate = await this.userRepo.isPrivateUser(post.authorId)
-    if (isPrivate) throw new UnauthorizedProfileException()
+    const accesibleUser = await this.userRepo.isPrivateUser(post.authorId)
+    if (!accesibleUser) throw new UnauthorizedProfileException()
     return await this.repository.getCommentsByPost(postId, options)
   }
 }

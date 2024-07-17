@@ -6,6 +6,10 @@ export class FollowServiceImpl implements FollowService {
   constructor (private readonly repository: FollowRepositoryImpl) {}
 
   async followUser (userId: string, followUserId: string): Promise<void> {
+    if (userId === followUserId) {
+      throw new ConflictException('CANNOT_FOLLOW_YOURSELF')
+    }
+
     const following = await this.repository.checkFollow(userId, followUserId)
 
     if (following) {
@@ -16,6 +20,9 @@ export class FollowServiceImpl implements FollowService {
   }
 
   async unfollowUser (userId: string, unfollowUserId: string): Promise<void> {
+    if (userId === unfollowUserId) {
+      throw new ConflictException('CANNOT_UNFOLLOW_YOURSELF')
+    }
     const following = await this.repository.checkFollow(userId, unfollowUserId)
 
     if (!following) {

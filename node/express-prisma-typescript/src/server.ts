@@ -6,6 +6,8 @@ import cors from 'cors'
 import { Constants, NodeEnv, Logger } from '@utils'
 import { router } from '@router'
 import { ErrorHandling } from '@utils/errors'
+import swaggerUi from 'swagger-ui-express'
+import { swaggerSpec } from '@utils/swagger'
 
 const app = express()
 
@@ -27,6 +29,12 @@ app.use(
 )
 
 app.use('/api', router)
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+
+app.get('/', (req, res) => {
+  res.redirect('/api-docs')
+})
 
 app.use(ErrorHandling)
 

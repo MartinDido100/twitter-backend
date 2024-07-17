@@ -18,16 +18,91 @@ const commentService = new CommentServiceImpl(
   new UserRepositoryImpl(db),
   new PostRepositoryImpl(db))
 
-commentRouter.post('/:postId', BodyValidation(CreatePostInputDTO), async (req: Request, res: Response) => {
-  const { userId } = res.locals.context
-  const { postId } = req.params
-  const data = req.body
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Comment:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: "aa649330-d933-40df-b029-12c5a60a041d"
+ *         content:
+ *           type: string
+ *           example: "This is a comment"
+ *         parentId:
+ *           type: string
+ *           example: "8f0db25a-39ad-463c-a1b7-c6c8669dba1b"
+ *         authorId:
+ *           type: string
+ *           example: "0c498c13-ade8-4a2f-b5c3-62e6b06cf13e"
+ *         createdAt:
+ *           type: string
+ *           example: "2021-07-12T21:00:00.000Z"
+ *         updatedAt:
+ *           type: string
+ *           example: "2021-07-12T21:00:00.000Z"
+ *         images:
+ *           example: [Array with images urls]
+ *     CommentBody:
+ *       type: object
+ *       properties:
+ *         content:
+ *           type: string
+ *           example: "This is a comment"
+ *         images:
+ *           required: false
+ *           type: array
+ *           items:
+ *             type: string
+ *             example: [Array with images urls]
+ */
 
-  const comment = await commentService.commentPost(userId, postId, data)
-
-  return res.status(HttpStatus.CREATED).json(comment)
-})
-
+/**
+ * @openapi
+ *
+ * /comment/by_user/{userId}:
+ *   get:
+ *     summary: Get comments by given user id.
+ *     tags:
+ *       - Comments
+ *     security:
+ *       - auth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Returns an array of comments made by the user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Comment'
+ *       403:
+ *         description: Returns an error if the user has his profile in private and the requester is not following him.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "You are not allowed to view this profile"
+ *       401:
+ *         description: Returns an error if the user is not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized. You must login to access this content."
+ */
 commentRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
   const { userId } = req.params
 
@@ -36,12 +111,140 @@ commentRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
   return res.status(HttpStatus.OK).json(comments)
 })
 
+/**
+ * @openapi
+ *
+ * /comment/{postId}:
+ *   get:
+ *     summary: Get comments by given post id.
+ *     tags:
+ *       - Comments
+ *     security:
+ *       - auth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the post for which comments are to be fetched.
+ *     responses:
+ *       200:
+ *         description: Returns an array of comments of the provided post.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Comment'
+ *       403:
+ *         description: Returns an error if the user has his profile in private and the requester is not following him.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "You are not allowed to view this profile"
+ *       401:
+ *         description: Returns an error if the user is not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized. You must login to access this content."
+ *       404:
+ *         description: Returns an error if the post is not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Not found. Couldn't find post"
+ */
 commentRouter.get('/:postId', async (req: Request, res: Response) => {
   const { postId } = req.params
-  // Record es como un set de java pero con tipos, trato al query asi pq el tipo que viene con ts no me sirve
   const { after, before, limit } = req.query as Record<string, string>
 
   const comments = await commentService.getCommentsByPost(postId, { after, before, limit: parseInt(limit) })
 
   return res.status(HttpStatus.OK).json(comments)
+})
+
+/**
+ * @openapi
+ *
+ * /comment/{postId}:
+ *   post:
+ *     summary: Comments the given post.
+ *     tags:
+ *       - Comments
+ *     security:
+ *       - auth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the post to comment on.
+ *     requestBody:
+ *       description: Comment body (images are optional).
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CommentBody'
+ *     responses:
+ *       201:
+ *         description: Returns the created comment.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Comment'
+ *       403:
+ *         description: Returns an error if the user has his profile in private and the requester is not following him.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "You are not allowed to view this profile"
+ *       401:
+ *         description: Returns an error if the user is not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized. You must login to access this content."
+ *       404:
+ *         description: Returns an error if the post to comment is not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Not found. Couldn't find post"
+ */
+commentRouter.post('/:postId', BodyValidation(CreatePostInputDTO), async (req: Request, res: Response) => {
+  const { userId } = res.locals.context
+  const { postId } = req.params
+  const data = req.body
+
+  const comment = await commentService.commentPost(userId, postId, data)
+
+  return res.status(HttpStatus.CREATED).json(comment)
 })

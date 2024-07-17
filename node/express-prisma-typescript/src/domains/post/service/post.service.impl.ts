@@ -2,7 +2,7 @@ import { CreatePostInputDTO, ExtendedPostDTO, PostDTO } from '../dto'
 import { PostRepository } from '../repository'
 import { PostService } from '.'
 import { validate } from 'class-validator'
-import { ForbiddenException, NotFoundException, UnauthorizedProfileException } from '@utils'
+import { ForbiddenException, NotFoundException } from '@utils'
 import { CursorPagination } from '@types'
 import { FollowRepository } from '@domains/follow/repository'
 import { UserRepository } from '@domains/user/repository'
@@ -53,7 +53,7 @@ export class PostServiceImpl implements PostService {
     if (!post) throw new NotFoundException('post')
 
     const accesiblePost = await this.validateAuthor(userId, post.authorId)
-    if (!accesiblePost) throw new UnauthorizedProfileException()
+    if (!accesiblePost) throw new ForbiddenException()
 
     post.images = await this.getImagesUrls(post.images)
 
@@ -75,7 +75,7 @@ export class PostServiceImpl implements PostService {
   async getPostsByAuthor (userId: any, authorId: string): Promise<ExtendedPostDTO[]> {
     // TODO: throw exception when the author has a private profile and the user doesn't follow them (DONE)
     const accesibleAuthor = await this.validateAuthor(userId, authorId)
-    if (!accesibleAuthor) throw new UnauthorizedProfileException()
+    if (!accesibleAuthor) throw new ForbiddenException()
 
     const posts = await this.repository.getByAuthorId(authorId)
 
