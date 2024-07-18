@@ -3,7 +3,7 @@ import { CommentDTO } from '../dto'
 import { CommentService } from '.'
 import { CommentRepository } from '../repository'
 import { CursorPagination } from '@types'
-import { NotFoundException, UnauthorizedProfileException } from '@utils'
+import { NotFoundException, ForbiddenException } from '@utils'
 import { FollowRepository } from '@domains/follow/repository'
 import { UserRepository } from '@domains/user/repository'
 import { PostRepository } from '@domains/post/repository'
@@ -27,14 +27,14 @@ export class CommentServiceImpl implements CommentService {
 
     const accesiblePost = await this.validateAuthor(userId, post.authorId)
 
-    if (!accesiblePost) throw new UnauthorizedProfileException()
+    if (!accesiblePost) throw new ForbiddenException()
 
     return await this.repository.commentPost(userId, postId, body)
   }
 
   async getCommentsByUser (userId: string): Promise<CommentDTO[]> {
     const accesibleUser = await this.userRepo.isPrivateUser(userId)
-    if (!accesibleUser) throw new UnauthorizedProfileException()
+    if (!accesibleUser) throw new ForbiddenException()
     return await this.repository.getCommentsByUser(userId)
   }
 
@@ -42,7 +42,7 @@ export class CommentServiceImpl implements CommentService {
     const post = await this.postRepo.getById(postId)
     if (!post) throw new NotFoundException('post')
     const accesibleUser = await this.userRepo.isPrivateUser(post.authorId)
-    if (!accesibleUser) throw new UnauthorizedProfileException()
+    if (!accesibleUser) throw new ForbiddenException()
     return await this.repository.getCommentsByPost(postId, options)
   }
 }

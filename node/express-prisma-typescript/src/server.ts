@@ -30,7 +30,7 @@ app.use(
 
 app.use('/api', router)
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { customSiteTitle: 'Twitter Backend API' }))
 
 app.get('/', (req, res) => {
   res.redirect('/api-docs')

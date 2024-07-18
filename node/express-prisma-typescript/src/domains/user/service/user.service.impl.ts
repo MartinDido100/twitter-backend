@@ -66,10 +66,10 @@ export class UserServiceImpl implements UserService {
   async updateProfilePicture (userId: string, extension: string): Promise<string> {
     const user = await this.repository.updateProfilePicture(userId, extension)
 
-    return await this.bucketManager.putImage(user.profilePicture ?? '')
+    return await this.bucketManager.putImage(user.profilePicture as string)
   }
 
-  async getUserByUsername (username: string, options: CursorPagination): Promise<UserViewDTO[]> {
+  async getUsersByUsername (username: string, options: CursorPagination): Promise<UserViewDTO[]> {
     const users = await this.repository.getByUsername(username, options)
 
     for (const user of users) {

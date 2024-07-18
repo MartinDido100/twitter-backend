@@ -27,15 +27,19 @@ const commentService = new CommentServiceImpl(
  *       properties:
  *         id:
  *           type: string
+ *           description: Comment id
  *           example: "aa649330-d933-40df-b029-12c5a60a041d"
  *         content:
  *           type: string
+ *           description: Comment content
  *           example: "This is a comment"
  *         parentId:
  *           type: string
+ *           description: Parent post id
  *           example: "8f0db25a-39ad-463c-a1b7-c6c8669dba1b"
  *         authorId:
  *           type: string
+ *           description: Author id
  *           example: "0c498c13-ade8-4a2f-b5c3-62e6b06cf13e"
  *         createdAt:
  *           type: string
@@ -44,25 +48,14 @@ const commentService = new CommentServiceImpl(
  *           type: string
  *           example: "2021-07-12T21:00:00.000Z"
  *         images:
- *           example: [Array with images urls]
- *     CommentBody:
- *       type: object
- *       properties:
- *         content:
- *           type: string
- *           example: "This is a comment"
- *         images:
- *           required: false
- *           type: array
- *           items:
- *             type: string
- *             example: [Array with images urls]
+ *           description: Comment images
+ *           example: [List of urls]
  */
 
 /**
  * @openapi
  *
- * /comment/by_user/{userId}:
+ * /comment/by_user/:userId:
  *   get:
  *     summary: Get comments by given user id.
  *     tags:
@@ -91,7 +84,7 @@ const commentService = new CommentServiceImpl(
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "You are not allowed to view this profile"
+ *                   example: "Forbidden. You are not allowed to perform this action"
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:
@@ -114,7 +107,7 @@ commentRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
 /**
  * @openapi
  *
- * /comment/{postId}:
+ * /comment/:postId:
  *   get:
  *     summary: Get comments by given post id.
  *     tags:
@@ -146,7 +139,7 @@ commentRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "You are not allowed to view this profile"
+ *                   example: "Forbidden. You are not allowed to perform this action"
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:
@@ -180,7 +173,7 @@ commentRouter.get('/:postId', async (req: Request, res: Response) => {
 /**
  * @openapi
  *
- * /comment/{postId}:
+ * /comment/:postId:
  *   post:
  *     summary: Comments the given post.
  *     tags:
@@ -200,7 +193,7 @@ commentRouter.get('/:postId', async (req: Request, res: Response) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CommentBody'
+ *             $ref: '#/components/schemas/CreatePostBody'
  *     responses:
  *       201:
  *         description: Returns the created comment.
@@ -217,7 +210,7 @@ commentRouter.get('/:postId', async (req: Request, res: Response) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "You are not allowed to view this profile"
+ *                   example: "Forbidden. You are not allowed to perform this action"
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:
@@ -238,6 +231,8 @@ commentRouter.get('/:postId', async (req: Request, res: Response) => {
  *                 message:
  *                   type: string
  *                   example: "Not found. Couldn't find post"
+ *       400:
+ *         description: Returns an error that means bad request error (invalid body).
  */
 commentRouter.post('/:postId', BodyValidation(CreatePostInputDTO), async (req: Request, res: Response) => {
   const { userId } = res.locals.context
