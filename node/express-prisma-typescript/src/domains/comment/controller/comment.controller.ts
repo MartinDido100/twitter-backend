@@ -55,7 +55,7 @@ const commentService = new CommentServiceImpl(
 /**
  * @openapi
  *
- * /comment/by_user/:userId:
+ * /comment/by_user/{userId}:
  *   get:
  *     summary: Get comments by given user id.
  *     tags:
@@ -107,7 +107,7 @@ commentRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
 /**
  * @openapi
  *
- * /comment/:postId:
+ * /comment/{postId}:
  *   get:
  *     summary: Get comments by given post id.
  *     tags:
@@ -173,7 +173,7 @@ commentRouter.get('/:postId', async (req: Request, res: Response) => {
 /**
  * @openapi
  *
- * /comment/:postId:
+ * /comment/{postId}:
  *   post:
  *     summary: Comments the given post.
  *     tags:

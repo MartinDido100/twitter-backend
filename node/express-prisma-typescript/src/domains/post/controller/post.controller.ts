@@ -160,7 +160,7 @@ postRouter.get('/', async (req: Request, res: Response) => {
 /**
  * @openapi
  *
- * /post/:postId:
+ * /post/{postId}:
  *   get:
  *     summary: Get a post by its id.
  *     tags:
@@ -226,7 +226,7 @@ postRouter.get('/:postId', async (req: Request, res: Response) => {
 /**
  * @openapi
  *
- * /post/by_user/:userId:
+ * /post/by_user/{userId}:
  *   get:
  *     summary: Get posts by given user id.
  *     tags:
@@ -282,7 +282,7 @@ postRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
 /**
  * @openapi
  *
- * /post/by_user/:userId:
+ * /post/by_user/{userId}:
  *   post:
  *     summary: Get posts by given user id.
  *     tags:
@@ -330,7 +330,7 @@ postRouter.post('/', BodyValidation(CreatePostInputDTO), imagesExtensionValidati
 /**
  * @openapi
  *
- * /post/:postId:
+ * /post/{postId}:
  *   delete:
  *     summary: Delete a post by its id.
  *     tags:

@@ -37,7 +37,7 @@ const reactionService = new ReactionServiceImpl(new ReactionRepositoryImpl(db))
 /**
  * @openapi
  *
- * /reaction/likes/:userId:
+ * /reaction/likes/{userId}:
  *   get:
  *     summary: Get all the likes of the given user.
  *     tags:
@@ -296,7 +296,7 @@ reactionRouter.delete('/like/:postId', async (req: Request, res: Response) => {
 /**
  * @openapi
  *
- * /reaction/retweet/:postId:
+ * /reaction/retweet/{postId}:
  *   delete:
  *     summary: Removes a retweet from a post.
  *     tags:

@@ -8,8 +8,12 @@ import { router } from '@router'
 import { ErrorHandling } from '@utils/errors'
 import swaggerUi from 'swagger-ui-express'
 import { swaggerSpec } from '@utils/swagger'
+import { createServer } from 'http'
+import { socketInit } from '@domains/socket'
 
 const app = express()
+const httpServer = createServer(app)
+socketInit(httpServer)
 
 // Set up request logger
 if (Constants.NODE_ENV === NodeEnv.DEV) {
@@ -38,6 +42,6 @@ app.get('/', (req, res) => {
 
 app.use(ErrorHandling)
 
-app.listen(Constants.PORT, () => {
+httpServer.listen(Constants.PORT, () => {
   Logger.info(`Server listening on port ${Constants.PORT}`)
 })

@@ -12,5 +12,5 @@ export interface UserRepository {
   unprivateUser: (userId: string) => Promise<void>
   isPrivateUser: (userId: string) => Promise<boolean>
   updateProfilePicture: (userId: string, extension: string) => Promise<UserDTO>
-  getByUsername: (username: string, options: CursorPagination) => Promise<UserViewDTO[]>
+  getByUsernamePaginated: (username: string, options: CursorPagination) => Promise<UserViewDTO[]>
 }

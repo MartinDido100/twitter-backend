@@ -35,6 +35,8 @@ model User {
   follows   Follow[]   @relation(name: "follows")
   followers Follow[]   @relation(name: "followers")
   reactions Reaction[]
+  messagesSent Message[] @relation(name: "messagesSent")
+  messagesRecieved Message[] @relation(name: "messagesRecieved")
 }
 
 model Follow {
@@ -85,6 +87,21 @@ model Reaction {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  senderId String @db.Uuid
+  receiverId String @db.Uuid
+
+  content String
+
+  createdAt DateTime @default(now())
+
+  sender User @relation(name: "messagesSent",fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation(name:"messagesRecieved",fields: [receiverId], references: [id], onDelete: Cascade)
+
 }
 
 enum reactionType {

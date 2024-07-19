@@ -13,7 +13,7 @@ const service = new FollowServiceImpl(new FollowRepositoryImpl(db))
 /**
  * @openapi
  *
- * /follower/follow/:userId:
+ * /follower/follow/{userId}:
  *   post:
  *     summary: Follows the given user.
  *     tags:
@@ -59,7 +59,7 @@ followerRouter.post('/follow/:userId', async (req: Request, res: Response) => {
 /**
  * @openapi
  *
- * /follower/unfollow/:userId:
+ * /follower/unfollow/{userId}:
  *   post:
  *     summary: Unfollows the given user.
  *     tags:

@@ -70,7 +70,7 @@ export class UserServiceImpl implements UserService {
   }
 
   async getUsersByUsername (username: string, options: CursorPagination): Promise<UserViewDTO[]> {
-    const users = await this.repository.getByUsername(username, options)
+    const users = await this.repository.getByUsernamePaginated(username, options)
 
     for (const user of users) {
       user.profilePicture = user.profilePicture ? await this.getProfilePicture(user.profilePicture) : null

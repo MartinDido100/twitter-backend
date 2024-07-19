@@ -134,7 +134,7 @@ export class UserRepositoryImpl implements UserRepository {
     })
   }
 
-  async getByUsername (username: string, options: CursorPagination): Promise<UserViewDTO[]> {
+  async getByUsernamePaginated (username: string, options: CursorPagination): Promise<UserViewDTO[]> {
     const users = await this.db.user.findMany({
       cursor: options.after ? { id: options.after } : options.before ? { id: options.before } : undefined,
       skip: options.after ?? options.before ? 1 : undefined,

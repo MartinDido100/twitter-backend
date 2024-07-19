@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 import { Request, Response } from 'express'
 import { Constants } from '@utils'
 import { UnauthorizedException } from '@utils/errors'
+import { Socket } from 'socket.io'
 
 export const generateAccessToken = (payload: Record<string, string | boolean | number>): string => {
   // Do not use this in production, the token will last 24 hours
@@ -21,6 +22,18 @@ export const withAuth = (req: Request, res: Response, next: () => any): void => 
   jwt.verify(token, Constants.TOKEN_SECRET, (err, context) => {
     if (err) throw new UnauthorizedException('INVALID_TOKEN')
     res.locals.context = context
+    next()
+  })
+}
+
+export const socketAuth = (socket: Socket, next: (err?: any) => any): void => {
+  const [bearer, token] = (socket.handshake.headers.authorization)?.split(' ') ?? []
+
+  if (!bearer || !token || bearer !== 'Bearer') next(new UnauthorizedException('MISSING_TOKEN'))
+
+  jwt.verify(token, Constants.TOKEN_SECRET, (err, context) => {
+    if (err) next(new UnauthorizedException('INVALID_TOKEN'))
+    socket.data.context = context
     next()
   })
 }
