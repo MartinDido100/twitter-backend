@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { Constants } from '@utils'
 import { UnauthorizedException } from '@utils/errors'
 import { Socket } from 'socket.io'
@@ -11,10 +11,9 @@ export const generateAccessToken = (payload: Record<string, string | boolean | n
   return jwt.sign(payload, Constants.TOKEN_SECRET, { expiresIn: '24h' })
 }
 
-export const withAuth = (req: Request, res: Response, next: () => any): void => {
+export const withAuth = (req: Request, res: Response, next: NextFunction): void => {
   // Get the token from the authorization header
   const [bearer, token] = (req.headers.authorization)?.split(' ') ?? []
-
   // Verify that the Authorization header has the expected shape
   if (!bearer || !token || bearer !== 'Bearer') throw new UnauthorizedException('MISSING_TOKEN')
 

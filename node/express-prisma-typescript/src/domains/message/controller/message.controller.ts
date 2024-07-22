@@ -2,8 +2,7 @@ import { Request, Response, Router } from 'express'
 import HttpStatus from 'http-status'
 import { MessageServiceImpl } from '../service'
 import { MessageRepositoryImpl } from '../repository'
-import { BodyValidation, db } from '@utils'
-import { CreateMessageInputDTO } from '../dto'
+import { db } from '@utils'
 
 export const messageRouter = Router()
 
@@ -16,12 +15,4 @@ messageRouter.get('/history/:userId', async (req: Request, res: Response) => {
   const messages = await service.getHistory(userId, otherUserId)
 
   return res.status(HttpStatus.OK).json(messages)
-})
-
-messageRouter.post('/', BodyValidation(CreateMessageInputDTO), async (req: Request, res: Response) => {
-  const { userId } = res.locals.context
-
-  const newMessage = await service.createMessage(userId, req.body)
-
-  return res.status(HttpStatus.CREATED).json(newMessage)
 })

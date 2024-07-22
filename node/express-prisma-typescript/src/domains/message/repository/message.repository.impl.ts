@@ -8,8 +8,16 @@ export class MessageRepositoryImpl implements MessageRepository {
   async getMessageHistory (senderId: string, receiverId: string): Promise<MessageDTO[]> {
     return await this.db.message.findMany({
       where: {
-        senderId,
-        receiverId
+        OR: [
+          {
+            receiverId,
+            senderId
+          },
+          {
+            receiverId: senderId,
+            senderId: receiverId
+          }
+        ]
       },
       orderBy: [
         {
