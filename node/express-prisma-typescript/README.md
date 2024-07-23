@@ -128,7 +128,7 @@ Endpoints for getting post information
 
 Fork this repository and complete the tasks. Then create a PR and start with your tasks.
 
-- [X] There's an unused table `Follow` that stores follows between users. Create a new `follower` domain (with it's own controller, service and repositories) that has two new endpoints `POST /api/follower/follow/:user_id` and `POST /api/follower/unfollow/:user_id`.
+- [x] There's an unused table `Follow` that stores follows between users. Create a new `follower` domain (with it's own controller, service and repositories) that has two new endpoints `POST /api/follower/follow/:user_id` and `POST /api/follower/unfollow/:user_id`.
 - [x] All users are currently public, meaning that i can see tweets from anyone, without having to follow them. Add the ability for users to have private profiles and store it in the User table. Update the `GET api/post` to return only posts with public account authors or private account authors that the user follows.
 - [x] Update the `GET api/post/:post_id` and `GET api/post/by_user/:user_id` to throw a 404 error if the author has a private account and the user does not follow them.
 - [x] The frontend team needs to integrate with the server, but they don't know what endpoints you have available or what they do. Document the API using [Swagger](https://blog.logrocket.com/documenting-express-js-api-swagger/)
@@ -136,15 +136,15 @@ Fork this repository and complete the tasks. Then create a PR and start with you
 - [x] Add the ability to comment in posts, a comment should be stored as a post, but still be able to query posts and comments separately.
 - [x] Create endpoints to query retweets, likes and comments by user id and put them in their respective domains.
 - [x] Users do not currently have a profile picture. Integrate with AWS S3 to store user profile pictures and post pictures. Careful! Do not receive images in your endpoints. Make use of S3 Pre-signed URLs. Update the UserDTO to include the profile image. You can use a public S3 bucket as it doesn't contain private data.
-- [x] Update  `GET api/user/me` and `GET api/user`  to return `UserViewDTO`.
+- [x] Update `GET api/user/me` and `GET api/user` to return `UserViewDTO`.
 - [x] Create endpoint `GET api/comment/:post_id` to get comments by post. Add Cursor Based Pagination (You can see how it works [here](./src/types/index.ts)). It should return `ExtendedPostDTO` and sorted by reactions.
-- [x] Create endpoint `GET api/user/by_username/:username` to return a list of `UserViewDTO`  of those users whose usernames are included in `:username`. Add pagination.
+- [x] Create endpoint `GET api/user/by_username/:username` to return a list of `UserViewDTO` of those users whose usernames are included in `:username`. Add pagination.
 - [x] Update `GET api/post` and `GET api/post/by_user/:user_id` to return a list of `ExtendedPostDTO`.
 - [x] Update `GET api/user/:user_id` to return `UserViewDTO`. Also return if the user follows the one making the request.
-- [ ] Using [SocketIO](https://socket.io/) create an authenticated websocket to create a real-time chat between users only if they follow eachother. Also messages should be stored in the database to keep the chat history.
+- [x] Using [SocketIO](https://socket.io/) create an authenticated websocket to create a real-time chat between users only if they follow eachother. Also messages should be stored in the database to keep the chat history.
 - [ ] Search for a testing framework and create some unit tests. Make a CI/CD pipeline using github actions to run those tests.
 - [ ] Deploy your backend and database to a service of your preference. Here are some recommended options:
-    - [Railway](https://railway.app/)
-    - [Fl/](https://docs.fl0.com/)
-    - [Back4app](https://www.back4app.com/)
-    - [AWS](https://aws.amazon.com/)(You need previous AWS knowledge)
+  - [Railway](https://railway.app/)
+  - [Fl/](https://docs.fl0.com/)
+  - [Back4app](https://www.back4app.com/)
+  - [AWS](https://aws.amazon.com/)(You need previous AWS knowledge)

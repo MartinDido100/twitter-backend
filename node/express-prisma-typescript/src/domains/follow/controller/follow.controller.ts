@@ -1,14 +1,14 @@
-import { Request, Response, Router } from 'express'
-import { FollowServiceImpl } from '../service'
-import { FollowRepositoryImpl } from '../repository'
-import { db } from '@utils'
-import HttpStatus from 'http-status'
+import { Request, Response, Router } from 'express';
+import { FollowServiceImpl } from '../service';
+import { FollowRepositoryImpl } from '../repository';
+import { db } from '@utils';
+import HttpStatus from 'http-status';
 
-import 'express-async-errors'
+import 'express-async-errors';
 
-export const followerRouter = Router()
+export const followerRouter = Router();
 
-const service = new FollowServiceImpl(new FollowRepositoryImpl(db))
+const service = new FollowServiceImpl(new FollowRepositoryImpl(db));
 
 /**
  * @openapi
@@ -46,15 +46,25 @@ const service = new FollowServiceImpl(new FollowRepositoryImpl(db))
  *                 error_code:
  *                   type: string
  *                   example: "USER_ALREADY_FOLLOWED"
+ *       401:
+ *         description: Returns an error if the user is not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized. You must login to access this content."
  *
  */
 followerRouter.post('/follow/:userId', async (req: Request, res: Response) => {
-  const { userId } = res.locals.context
-  const { userId: followUserId } = req.params
+  const { userId } = res.locals.context;
+  const { userId: followUserId } = req.params;
 
-  await service.followUser(userId, followUserId)
-  res.status(HttpStatus.CREATED).send('Followed')
-})
+  await service.followUser(userId, followUserId);
+  res.status(HttpStatus.CREATED).send('Followed');
+});
 
 /**
  * @openapi
@@ -92,10 +102,20 @@ followerRouter.post('/follow/:userId', async (req: Request, res: Response) => {
  *                 error_code:
  *                   type: string
  *                   example: "USER_ALREADY_FOLLOWED"
+ *       401:
+ *         description: Returns an error if the user is not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized. You must login to access this content."
  */
 followerRouter.post('/unfollow/:userId', async (req: Request, res: Response) => {
-  const { userId } = res.locals.context
-  const { userId: followUserId } = req.params
-  await service.unfollowUser(userId, followUserId)
-  res.status(HttpStatus.CREATED).send('Unfollowed')
-})
+  const { userId } = res.locals.context;
+  const { userId: followUserId } = req.params;
+  await service.unfollowUser(userId, followUserId);
+  res.status(HttpStatus.CREATED).send('Unfollowed');
+});

@@ -3,11 +3,10 @@ import HttpStatus from 'http-status'
 // express-async-errors is a module that handles async errors in express, don't forget import it in your new controllers
 import 'express-async-errors'
 
-import { db, InvalidExtensionException, s3 } from '@utils'
+import { db, InvalidExtensionException, s3, BucketManager } from '@utils'
 
 import { UserRepositoryImpl } from '../repository'
 import { UserService, UserServiceImpl } from '../service'
-import { BucketManager } from '@utils/s3bucket'
 import { AllowedExtensions } from '../dto'
 import { FollowRepositoryImpl } from '@domains/follow/repository'
 
