@@ -5,6 +5,10 @@
   },
   "extends": "standard-with-typescript",
   "overrides": [],
+  "ignorePatterns": [
+    "jest.config.js",
+    "node_modules/"
+  ],
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module",

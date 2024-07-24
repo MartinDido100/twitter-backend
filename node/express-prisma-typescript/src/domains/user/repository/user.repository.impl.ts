@@ -123,15 +123,20 @@ export class UserRepositoryImpl implements UserRepository {
     })
   }
 
-  async updateProfilePicture (userId: string, extension: string): Promise <UserDTO> {
-    return await this.db.user.update({
+  async updateProfilePicture (userId: string, extension: string): Promise <string> {
+    const user = await this.db.user.update({
       where: {
         id: userId
       },
       data: {
         profilePicture: `profile/${userId}.${extension}`
+      },
+      select: {
+        profilePicture: true
       }
     })
+
+    return user.profilePicture as string
   }
 
   async getByUsernamePaginated (username: string, options: CursorPagination): Promise<UserViewDTO[]> {
