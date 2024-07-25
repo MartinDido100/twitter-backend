@@ -29,5 +29,5 @@
   },
   "lib": ["es2022"],
   "include": ["src/**/*", "tests"],
-  "exclude": ["node_modules","jest.config.js"]
+  "exclude": ["node_modules","jest.config.ts"]
 }

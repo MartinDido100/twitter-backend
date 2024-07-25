@@ -1,8 +1,8 @@
 import { SignupInputDTO } from '@domains/auth/dto'
 import { AuthService, AuthServiceImpl } from '@domains/auth/service'
-import { ConflictException } from '@utils'
+import { ConflictException, NotFoundException, UnauthorizedException } from '@utils'
 import { userRepositoryMock } from '../mock'
-import { checkPasswordSpy } from './auth.mock'
+import { checkPasswordSpy, encryptPasswordSpy, generateTokenSpy } from './auth.mock'
 
 describe('Auth tests', () => {
   let service: AuthService
@@ -28,10 +28,13 @@ describe('Auth tests', () => {
       const result = await service.signup(input)
 
       // then
+      expect(encryptPasswordSpy).toHaveBeenCalledTimes(1)
+      expect(generateTokenSpy).toHaveBeenCalledTimes(1)
       expect(result).toHaveProperty('token')
     })
 
     it('should throw a ConflictException', async () => {
+      // given
       const input = {
         email: 'email@email.com',
         username: 'username',
@@ -40,7 +43,6 @@ describe('Auth tests', () => {
 
       userRepositoryMock.getByEmailOrUsername.mockResolvedValue({ id: 'userId', name: null, createdAt: new Date(), profilePicture: null, email: input.email, username: input.username, password: 'encryptedPassword' })
 
-      expect.assertions(2)
       try {
         await service.signup(input)
       } catch (e) {
@@ -56,7 +58,6 @@ describe('Auth tests', () => {
   describe('login method', () => {
     it('should return a token', async () => {
       // given
-
       checkPasswordSpy.mockResolvedValue(true)
 
       const input = {
@@ -81,6 +82,59 @@ describe('Auth tests', () => {
       // then
       expect(checkPasswordSpy).toHaveBeenCalledTimes(1)
       expect(result).toHaveProperty('token')
+    })
+
+    it('should throw NotFoundException if user was not found', async () => {
+      // given
+      const input = {
+        email: 'email@email.com',
+        username: 'username',
+        password: 'password'
+      }
+
+      userRepositoryMock.getByEmailOrUsername.mockResolvedValue(null)
+
+      try {
+        // when
+        await service.login(input)
+      } catch (e) {
+        // then
+        expect(e).toBeInstanceOf(NotFoundException)
+        expect(e).toMatchObject({ message: "Not found. Couldn't find user" })
+      }
+    })
+
+    it('should throw UnauthorizedException if password is incorrect', async () => {
+      // given
+      const input = {
+        email: 'email@email.com',
+        username: 'username',
+        password: 'password'
+      }
+
+      checkPasswordSpy.mockResolvedValue(false)
+
+      userRepositoryMock.getByEmailOrUsername.mockResolvedValue({
+        id: 'userId',
+        name: null,
+        createdAt: new Date(),
+        profilePicture: null,
+        email: input.email,
+        username: input.username,
+        password: 'encryptedPassword'
+      })
+
+      try {
+        // when
+        await service.login(input)
+      } catch (e) {
+        // then
+        expect(e).toBeInstanceOf(UnauthorizedException)
+        expect(e).toMatchObject({
+          message: 'Unauthorized. You must login to access this content.',
+          error: { error_code: 'INCORRECT_PASSWORD' }
+        })
+      }
     })
   })
 })

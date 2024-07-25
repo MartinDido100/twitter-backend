@@ -14,9 +14,9 @@ export class CommentServiceImpl implements CommentService {
     private readonly userRepo: UserRepository,
     private readonly postRepo: PostRepository) {}
 
-  private async validateAuthor (userId: string, authorId: string): Promise<boolean> {
-    const isFollowing = await this.followRepo.checkFollow(userId, authorId)
-    const isPrivate = await this.userRepo.isPrivateUser(authorId)
+  private async validateAccesibility (userId: string, otherUserId: string): Promise<boolean> {
+    const isFollowing = await this.followRepo.checkFollow(userId, otherUserId)
+    const isPrivate = await this.userRepo.isPrivateUser(otherUserId)
 
     return !isPrivate || isFollowing
   }
@@ -25,23 +25,25 @@ export class CommentServiceImpl implements CommentService {
     const post = await this.postRepo.getById(postId)
     if (!post) throw new NotFoundException('post')
 
-    const accesiblePost = await this.validateAuthor(userId, post.authorId)
+    const accesiblePost = await this.validateAccesibility(userId, post.authorId)
 
     if (!accesiblePost) throw new ForbiddenException()
 
     return await this.repository.commentPost(userId, postId, body)
   }
 
-  async getCommentsByUser (userId: string): Promise<CommentDTO[]> {
-    const accesibleUser = await this.userRepo.isPrivateUser(userId)
+  async getCommentsByUser (loggedUserId: string, userId: string): Promise<CommentDTO[]> {
+    const user = await this.userRepo.getById(userId)
+    if (!user) throw new NotFoundException('user')
+    const accesibleUser = await this.validateAccesibility(loggedUserId, userId)
     if (!accesibleUser) throw new ForbiddenException()
     return await this.repository.getCommentsByUser(userId)
   }
 
-  async getCommentsByPost (postId: string, options: CursorPagination): Promise<CommentDTO[]> {
+  async getCommentsByPost (userId: string, postId: string, options: CursorPagination): Promise<CommentDTO[]> {
     const post = await this.postRepo.getById(postId)
     if (!post) throw new NotFoundException('post')
-    const accesibleUser = await this.userRepo.isPrivateUser(post.authorId)
+    const accesibleUser = await this.validateAccesibility(userId, post.authorId)
     if (!accesibleUser) throw new ForbiddenException()
     return await this.repository.getCommentsByPost(postId, options)
   }

@@ -97,9 +97,10 @@ const commentService = new CommentServiceImpl(
  *                   example: "Unauthorized. You must login to access this content."
  */
 commentRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
-  const { userId } = req.params
+  const { userId } = res.locals.context
+  const { userId: otherUserId } = req.params
 
-  const comments = await commentService.getCommentsByUser(userId)
+  const comments = await commentService.getCommentsByUser(userId, otherUserId)
 
   return res.status(HttpStatus.OK).json(comments)
 })
@@ -163,9 +164,10 @@ commentRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
  */
 commentRouter.get('/:postId', async (req: Request, res: Response) => {
   const { postId } = req.params
+  const { userId } = res.locals.context
   const { after, before, limit } = req.query as Record<string, string>
 
-  const comments = await commentService.getCommentsByPost(postId, { after, before, limit: parseInt(limit) })
+  const comments = await commentService.getCommentsByPost(userId, postId, { after, before, limit: parseInt(limit) })
 
   return res.status(HttpStatus.OK).json(comments)
 })
