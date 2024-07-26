@@ -11,7 +11,7 @@
     "db:migrate": "prisma migrate deploy",
     "db:make-migrations": "prisma migrate dev",
     "db:generate": "prisma generate",
-    "test": "jest --watch"
+    "test": "jest"
   },
   "prisma": {
     "schema": "./prisma/schema.prisma"

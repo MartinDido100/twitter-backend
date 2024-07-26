@@ -1,4 +1,3 @@
-import { SignupInputDTO } from '@domains/auth/dto'
 import { AuthService, AuthServiceImpl } from '@domains/auth/service'
 import { ConflictException, NotFoundException, UnauthorizedException } from '@utils'
 import { userRepositoryMock } from '../mock'
@@ -6,14 +5,8 @@ import { checkPasswordSpy, encryptPasswordSpy, generateTokenSpy } from './auth.m
 
 describe('Auth tests', () => {
   let service: AuthService
-  let input: SignupInputDTO
 
   beforeEach(() => {
-    input = {
-      email: 'email@email.com',
-      username: 'username',
-      password: 'password'
-    }
     service = new AuthServiceImpl(userRepositoryMock)
     jest.resetAllMocks()
   })
@@ -21,6 +14,11 @@ describe('Auth tests', () => {
   describe('signup method', () => {
     it('should return a token', async () => {
       // given
+      const input = {
+        email: 'email@email.com',
+        username: 'username',
+        password: 'password'
+      }
 
       userRepositoryMock.getByEmailOrUsername.mockResolvedValue(null)
       userRepositoryMock.create.mockResolvedValue({ id: 'userId', name: null, createdAt: new Date(), profilePicture: null })
@@ -36,6 +34,12 @@ describe('Auth tests', () => {
 
     it('should throw a ConflictException', async () => {
       // given
+      const input = {
+        email: 'email@email.com',
+        username: 'username',
+        password: 'password'
+      }
+
       userRepositoryMock.getByEmailOrUsername.mockResolvedValue({ id: 'userId', name: null, createdAt: new Date(), profilePicture: null, email: input.email, username: input.username, password: 'encryptedPassword' })
 
       try {
@@ -53,6 +57,12 @@ describe('Auth tests', () => {
   describe('login method', () => {
     it('should return a token', async () => {
       // given
+      const input = {
+        email: 'email@email.com',
+        username: 'username',
+        password: 'password'
+      }
+
       checkPasswordSpy.mockResolvedValue(true)
 
       userRepositoryMock.getByEmailOrUsername.mockResolvedValue({
@@ -75,6 +85,11 @@ describe('Auth tests', () => {
 
     it('should throw NotFoundException if user was not found', async () => {
       // given
+      const input = {
+        email: 'email@email.com',
+        username: 'username',
+        password: 'password'
+      }
 
       userRepositoryMock.getByEmailOrUsername.mockResolvedValue(null)
 
@@ -90,6 +105,11 @@ describe('Auth tests', () => {
 
     it('should throw UnauthorizedException if password is incorrect', async () => {
       // given
+      const input = {
+        email: 'email@email.com',
+        username: 'username',
+        password: 'password'
+      }
 
       checkPasswordSpy.mockResolvedValue(false)
 

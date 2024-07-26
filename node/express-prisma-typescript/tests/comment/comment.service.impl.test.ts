@@ -2,8 +2,9 @@ import { CommentService, CommentServiceImpl } from '@domains/comment'
 import { followRepositoryMock, postRepositoryMock, userRepositoryMock } from '../mock'
 import { commentRepositoryMock } from './comment.mock'
 import { CreatePostInputDTO } from '@domains/post/dto'
-import { CommentDTO } from '@domains/comment/dto'
+import { CommentDTO, ExtendedCommentDTO } from '@domains/comment/dto'
 import { ForbiddenException, NotFoundException } from '@utils'
+import { UserViewDTO } from '@domains/user/dto'
 
 describe('Comment service tests', () => {
   let service: CommentService
@@ -24,11 +25,13 @@ describe('Comment service tests', () => {
 
       userRepositoryMock.isPrivateUser.mockResolvedValue(false)
 
+      const createdAt = new Date()
+
       postRepositoryMock.getById.mockResolvedValue({
         id: postId,
         content: 'Post content',
         images: [],
-        createdAt: new Date(),
+        createdAt,
         authorId: 'authorId'
       })
 
@@ -37,7 +40,7 @@ describe('Comment service tests', () => {
         authorId: 'authorId',
         content: body.content,
         images: [],
-        createdAt: new Date(),
+        createdAt,
         parentId: postId
       })
 
@@ -46,7 +49,7 @@ describe('Comment service tests', () => {
         authorId: 'authorId',
         content: body.content,
         images: [],
-        createdAt: new Date(),
+        createdAt,
         parentId: postId
       }
 
@@ -54,9 +57,9 @@ describe('Comment service tests', () => {
       const result = await service.commentPost(userId, postId, body)
 
       // then
-      expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(1)
-      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(1)
-      expect(postRepositoryMock.getById).toHaveBeenCalledTimes(1)
+      expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
+      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalled()
+      expect(postRepositoryMock.getById).toHaveBeenCalled()
       expect(result).toEqual(expected)
     })
 
@@ -68,6 +71,8 @@ describe('Comment service tests', () => {
         content: 'Comment content'
       }
 
+      const createdAt = new Date()
+
       followRepositoryMock.checkFollow.mockResolvedValue(true)
       userRepositoryMock.isPrivateUser.mockResolvedValue(true)
 
@@ -75,7 +80,7 @@ describe('Comment service tests', () => {
         id: postId,
         content: 'Post content',
         images: [],
-        createdAt: new Date(),
+        createdAt,
         authorId: 'authorId'
       })
 
@@ -84,7 +89,7 @@ describe('Comment service tests', () => {
         authorId: 'authorId',
         content: body.content,
         images: [],
-        createdAt: new Date(),
+        createdAt,
         parentId: postId
       })
 
@@ -93,7 +98,7 @@ describe('Comment service tests', () => {
         authorId: 'authorId',
         content: body.content,
         images: [],
-        createdAt: new Date(),
+        createdAt,
         parentId: postId
       }
 
@@ -101,9 +106,9 @@ describe('Comment service tests', () => {
       const result = await service.commentPost(userId, postId, body)
 
       // then
-      expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(1)
-      expect(postRepositoryMock.getById).toHaveBeenCalledTimes(1)
-      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(1)
+      expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
+      expect(postRepositoryMock.getById).toHaveBeenCalled()
+      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalled()
       expect(result).toEqual(expected)
     })
 
@@ -127,6 +132,9 @@ describe('Comment service tests', () => {
         // then
         expect(e).toBeInstanceOf(NotFoundException)
         expect(e).toMatchObject({ message: "Not found. Couldn't find post" })
+        expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(0)
+        expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(0)
+        expect(postRepositoryMock.getById).toHaveBeenCalledTimes(1)
       }
     })
 
@@ -134,6 +142,7 @@ describe('Comment service tests', () => {
       // given
       const userId = 'userId'
       const postId = 'postId'
+      const createdAt = new Date()
       const body: CreatePostInputDTO = {
         content: 'Comment content'
       }
@@ -145,7 +154,7 @@ describe('Comment service tests', () => {
         id: postId,
         content: 'Post content',
         images: [],
-        createdAt: new Date(),
+        createdAt,
         authorId: 'authorId'
       })
 
@@ -156,6 +165,9 @@ describe('Comment service tests', () => {
         // then
         expect(e).toBeInstanceOf(ForbiddenException)
         expect(e).toMatchObject({ message: 'Forbidden. You are not allowed to perform this action' })
+        expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(1)
+        expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(1)
+        expect(postRepositoryMock.getById).toHaveBeenCalledTimes(1)
       }
     })
   })
@@ -164,6 +176,7 @@ describe('Comment service tests', () => {
     it('should return an array of comments if author has public profile', async () => {
       const userId = 'userId'
       const loggedUserId = 'loggedId'
+      const createdAt = new Date()
 
       userRepositoryMock.isPrivateUser.mockResolvedValue(false)
 
@@ -180,7 +193,7 @@ describe('Comment service tests', () => {
           authorId: userId,
           content: 'Comment content 1',
           images: [],
-          createdAt: new Date(),
+          createdAt,
           parentId: 'postId1'
         },
         {
@@ -188,7 +201,7 @@ describe('Comment service tests', () => {
           authorId: userId,
           content: 'Comment content 2',
           images: [],
-          createdAt: new Date(),
+          createdAt,
           parentId: 'postId2'
         }
       ])
@@ -199,7 +212,7 @@ describe('Comment service tests', () => {
           authorId: userId,
           content: 'Comment content 1',
           images: [],
-          createdAt: new Date(),
+          createdAt,
           parentId: 'postId1'
         },
         {
@@ -207,7 +220,7 @@ describe('Comment service tests', () => {
           authorId: userId,
           content: 'Comment content 2',
           images: [],
-          createdAt: new Date(),
+          createdAt,
           parentId: 'postId2'
         }
       ]
@@ -216,15 +229,16 @@ describe('Comment service tests', () => {
       const result = await service.getCommentsByUser(loggedUserId, userId)
 
       // then
-      expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(1)
-      expect(userRepositoryMock.getById).toHaveBeenCalledTimes(1)
-      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(1)
+      expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
+      expect(userRepositoryMock.getById).toHaveBeenCalled()
+      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalled()
       expect(result).toEqual(expected)
     })
 
     it('should return an array of comments if author has private profile but logged user is following him', async () => {
       const userId = 'userId'
       const loggedUserId = 'loggedId'
+      const createdAt = new Date()
 
       userRepositoryMock.isPrivateUser.mockResolvedValue(true)
       followRepositoryMock.checkFollow.mockResolvedValue(true)
@@ -242,7 +256,7 @@ describe('Comment service tests', () => {
           authorId: userId,
           content: 'Comment content 1',
           images: [],
-          createdAt: new Date(),
+          createdAt,
           parentId: 'postId1'
         },
         {
@@ -250,7 +264,7 @@ describe('Comment service tests', () => {
           authorId: userId,
           content: 'Comment content 2',
           images: [],
-          createdAt: new Date(),
+          createdAt,
           parentId: 'postId2'
         }
       ])
@@ -261,7 +275,7 @@ describe('Comment service tests', () => {
           authorId: userId,
           content: 'Comment content 1',
           images: [],
-          createdAt: new Date(),
+          createdAt,
           parentId: 'postId1'
         },
         {
@@ -269,7 +283,7 @@ describe('Comment service tests', () => {
           authorId: userId,
           content: 'Comment content 2',
           images: [],
-          createdAt: new Date(),
+          createdAt,
           parentId: 'postId2'
         }
       ]
@@ -278,9 +292,9 @@ describe('Comment service tests', () => {
       const result = await service.getCommentsByUser(loggedUserId, userId)
 
       // then
-      expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(1)
-      expect(userRepositoryMock.getById).toHaveBeenCalledTimes(1)
-      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(1)
+      expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
+      expect(userRepositoryMock.getById).toHaveBeenCalled()
+      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalled()
       expect(result).toEqual(expected)
     })
 
@@ -323,7 +337,252 @@ describe('Comment service tests', () => {
         // then
         expect(e).toBeInstanceOf(ForbiddenException)
         expect(e).toMatchObject({ message: 'Forbidden. You are not allowed to perform this action' })
+        expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(1)
+        expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(1)
+        expect(userRepositoryMock.getById).toHaveBeenCalledTimes(1)
       }
     })
+
+    it('should throw NotFoundException if user to find comments was not found', async () => {
+      // given
+      const userId = 'userId'
+      const loggedUserId = 'loggedId'
+
+      userRepositoryMock.isPrivateUser.mockResolvedValue(false)
+
+      userRepositoryMock.getById.mockResolvedValue(null)
+
+      try {
+        // when
+        await service.getCommentsByUser(loggedUserId, userId)
+      } catch (e) {
+        // then
+        expect(e).toBeInstanceOf(NotFoundException)
+        expect(e).toMatchObject({ message: "Not found. Couldn't find user" })
+        expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(0)
+        expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(0)
+        expect(userRepositoryMock.getById).toHaveBeenCalledTimes(1)
+      }
+    })
+  })
+
+  describe('getCommentsByPost method', () => {
+    it('should return an array of comments if post author has public profile', async () => {
+      // given
+      const postId = 'postId'
+      const loggedUserId = 'loggedId'
+      const createdAt = new Date()
+      const options = { limit: 1, after: 'afterCursorId' }
+      const author: UserViewDTO = {
+        id: 'authorId',
+        name: 'name',
+        username: 'username',
+        profilePicture: null
+      }
+
+      userRepositoryMock.isPrivateUser.mockResolvedValue(false)
+
+      postRepositoryMock.getById.mockResolvedValue({
+        id: 'postId',
+        authorId: 'authorId',
+        content: 'Post Content',
+        images: [],
+        createdAt
+      })
+
+      commentRepositoryMock.getCommentsByPost.mockResolvedValue([
+        {
+          id: 'commentId1',
+          authorId: 'authorId',
+          content: 'Comment content 1',
+          images: [],
+          createdAt,
+          parentId: 'postId1',
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author
+        },
+        {
+          id: 'commentId2',
+          authorId: 'authorId',
+          content: 'Comment content 2',
+          images: [],
+          createdAt,
+          parentId: 'postId2',
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author
+        }
+      ])
+
+      const expected: ExtendedCommentDTO[] = [
+        {
+          id: 'commentId1',
+          authorId: 'authorId',
+          content: 'Comment content 1',
+          images: [],
+          createdAt,
+          parentId: 'postId1',
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author
+        },
+        {
+          id: 'commentId2',
+          authorId: 'authorId',
+          content: 'Comment content 2',
+          images: [],
+          createdAt,
+          parentId: 'postId2',
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author
+        }
+      ]
+
+      // when
+      const result = await service.getCommentsByPost(loggedUserId, postId, options)
+
+      // then
+      expect(result).toEqual(expected)
+      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalled()
+      expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
+      expect(postRepositoryMock.getById).toHaveBeenCalled()
+    })
+
+    it('should return an array of comments if post author has private profile but logges user is following him', async () => {
+      // given
+      const postId = 'postId'
+      const loggedUserId = 'loggedId'
+      const createdAt = new Date()
+      const options = { limit: 1, after: 'afterCursorId' }
+      const author: UserViewDTO = {
+        id: 'authorId',
+        name: 'name',
+        username: 'username',
+        profilePicture: null
+      }
+
+      userRepositoryMock.isPrivateUser.mockResolvedValue(true)
+      followRepositoryMock.checkFollow.mockResolvedValue(true)
+
+      postRepositoryMock.getById.mockResolvedValue({
+        id: 'postId',
+        authorId: 'authorId',
+        content: 'Post Content',
+        images: [],
+        createdAt
+      })
+
+      commentRepositoryMock.getCommentsByPost.mockResolvedValue([
+        {
+          id: 'commentId1',
+          authorId: 'authorId',
+          content: 'Comment content 1',
+          images: [],
+          createdAt,
+          parentId: 'postId1',
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author
+        },
+        {
+          id: 'commentId2',
+          authorId: 'authorId',
+          content: 'Comment content 2',
+          images: [],
+          createdAt,
+          parentId: 'postId2',
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author
+        }
+      ])
+
+      const expected: ExtendedCommentDTO[] = [
+        {
+          id: 'commentId1',
+          authorId: 'authorId',
+          content: 'Comment content 1',
+          images: [],
+          createdAt,
+          parentId: 'postId1',
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author
+        },
+        {
+          id: 'commentId2',
+          authorId: 'authorId',
+          content: 'Comment content 2',
+          images: [],
+          createdAt,
+          parentId: 'postId2',
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author
+        }
+      ]
+
+      // when
+      const result = await service.getCommentsByPost(loggedUserId, postId, options)
+
+      // then
+      expect(result).toEqual(expected)
+      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalled()
+      expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
+      expect(postRepositoryMock.getById).toHaveBeenCalled()
+    })
+  })
+
+  it('should throw NotFoundException if post to query comments was not found', async () => {
+    // given
+    const postId = 'postId'
+    const loggedUserId = 'loggedId'
+    const options = { limit: 1, after: 'afterCursorId' }
+
+    postRepositoryMock.getById.mockResolvedValue(null)
+
+    try {
+      // when
+      await service.getCommentsByPost(loggedUserId, postId, options)
+    } catch (e) {
+      // then
+      expect(e).toBeInstanceOf(NotFoundException)
+      expect(e).toMatchObject({ message: "Not found. Couldn't find post" })
+      expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(0)
+      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(0)
+      expect(postRepositoryMock.getById).toHaveBeenCalled()
+    }
+  })
+
+  it('should throw ForbiddenException if author has private profile and logged user is not following him', async () => {
+    // given
+    const postId = 'postId'
+    const loggedUserId = 'loggedId'
+    const options = { limit: 1, after: 'afterCursorId' }
+
+    postRepositoryMock.getById.mockResolvedValue({
+      id: 'postId',
+      authorId: 'authorId',
+      content: 'Post Content',
+      images: [],
+      createdAt: new Date()
+    })
+
+    userRepositoryMock.isPrivateUser.mockResolvedValue(true)
+    followRepositoryMock.checkFollow.mockResolvedValue(false)
+
+    try {
+      // when
+      await service.getCommentsByPost(loggedUserId, postId, options)
+    } catch (e) {
+      // then
+      expect(e).toBeInstanceOf(ForbiddenException)
+      expect(e).toMatchObject({ message: 'Forbidden. You are not allowed to perform this action' })
+      expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
+      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalled()
+      expect(postRepositoryMock.getById).toHaveBeenCalled()
+    }
   })
 })

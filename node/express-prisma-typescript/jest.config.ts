@@ -3,7 +3,7 @@
  * https://jestjs.io/docs/configuration
  */
 
-import type { Config } from 'jest';
+import type { Config } from 'jest'
 
 const config: Config = {
   preset: 'ts-jest',
@@ -14,11 +14,11 @@ const config: Config = {
     '^@domains/(.*)$': '<rootDir>/src/domains/$1',
     '^@domains$': '<rootDir>/src/domains',
     '^@app$': '<rootDir>/src/app',
-    '^@router$': '<rootDir>/src/router',
+    '^@router$': '<rootDir>/src/router'
   },
   transform: {
-    '^.+\\.ts?$': 'ts-jest',
+    '^.+\\.ts?$': 'ts-jest'
   }
-};
+}
 
-export default config;
+export default config

@@ -1,7 +1,6 @@
 import { CreatePostInputDTO, ExtendedPostDTO, PostDTO } from '../dto'
 import { PostRepository } from '../repository'
 import { PostService } from '.'
-import { validate } from 'class-validator'
 import { ForbiddenException, NotFoundException } from '@utils'
 import { CursorPagination } from '@types'
 import { FollowRepository } from '@domains/follow/repository'
@@ -18,7 +17,7 @@ export class PostServiceImpl implements PostService {
     const isFollowing = await this.followRepo.checkFollow(userId, authorId)
     const isPrivate = await this.userRepo.isPrivateUser(authorId)
 
-    return !isPrivate || isFollowing
+    return !isPrivate || isFollowing || userId === authorId
   }
 
   private async generatePutImagesUrls (images: string[]): Promise<string[]> {
@@ -32,7 +31,6 @@ export class PostServiceImpl implements PostService {
   }
 
   async createPost (userId: string, data: CreatePostInputDTO): Promise<PostDTO> {
-    await validate(data)
     const newPost = await this.repository.create(userId, data)
 
     newPost.images = await this.generatePutImagesUrls(newPost.images)

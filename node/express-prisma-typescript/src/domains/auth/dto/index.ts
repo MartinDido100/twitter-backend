@@ -19,10 +19,15 @@ export class SignupInputDTO {
   @IsStrongPassword()
     password: string
 
-  constructor (email: string, username: string, password: string) {
+  @IsNotEmpty()
+  @IsString()
+    name!: string
+
+  constructor (email: string, username: string, password: string, name: string) {
     this.email = email
     this.password = password
     this.username = username
+    this.name = name
   }
 }
 

@@ -37,6 +37,10 @@ const service: AuthService = new AuthServiceImpl(new UserRepositoryImpl(db))
  *                 type: string
  *                 description: The username of the user.
  *                 example: "username"
+ *               name:
+ *                 type: string
+ *                 description: The name of the user.
+ *                 example: "name"
  *               password:
  *                 type: string
  *                 description: The password of the user (must be at least 6 characters long, has lower and upper case characters, a number, and a symbol).

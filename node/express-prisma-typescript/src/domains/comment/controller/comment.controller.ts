@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { CommentServiceImpl } from '../service'
 import { CommentRepositoryImpl } from '../repository'
-import { BodyValidation, db } from '@utils'
+import { BodyValidation, BucketManager, db, s3 } from '@utils'
 import { CreatePostInputDTO } from '@domains/post/dto'
 import HttpStatus from 'http-status'
 import { PostRepositoryImpl } from '@domains/post/repository'
@@ -16,7 +16,8 @@ const commentService = new CommentServiceImpl(
   new CommentRepositoryImpl(db),
   new FollowRepositoryImpl(db),
   new UserRepositoryImpl(db),
-  new PostRepositoryImpl(db))
+  new PostRepositoryImpl(db),
+  new BucketManager(s3))
 
 /**
  * @openapi
