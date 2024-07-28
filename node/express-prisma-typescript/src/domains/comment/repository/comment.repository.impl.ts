@@ -15,7 +15,8 @@ export class CommentRepositoryImpl implements CommentRepository {
         authorId: userId,
         postType: PostEnum.COMMENT,
         parentId: postId,
-        ...data
+        ...data,
+        images: data.images?.map((image, index) => `postImages/${userId}/${Date.now()}${index}${image}`)
       }
     })
     return new CommentDTO(comment)

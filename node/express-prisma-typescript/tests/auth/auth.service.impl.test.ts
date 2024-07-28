@@ -17,7 +17,8 @@ describe('Auth tests', () => {
       const input = {
         email: 'email@email.com',
         username: 'username',
-        password: 'password'
+        password: 'password',
+        name: 'name'
       }
 
       userRepositoryMock.getByEmailOrUsername.mockResolvedValue(null)
@@ -37,7 +38,8 @@ describe('Auth tests', () => {
       const input = {
         email: 'email@email.com',
         username: 'username',
-        password: 'password'
+        password: 'password',
+        name: 'name'
       }
 
       userRepositoryMock.getByEmailOrUsername.mockResolvedValue({ id: 'userId', name: null, createdAt: new Date(), profilePicture: null, email: input.email, username: input.username, password: 'encryptedPassword' })

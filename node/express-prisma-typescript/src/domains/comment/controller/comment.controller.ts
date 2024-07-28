@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { CommentServiceImpl } from '../service'
 import { CommentRepositoryImpl } from '../repository'
-import { BodyValidation, BucketManager, db, s3 } from '@utils'
+import { BodyValidation, BucketManager, db, imagesExtensionValidation, s3 } from '@utils'
 import { CreatePostInputDTO } from '@domains/post/dto'
 import HttpStatus from 'http-status'
 import { PostRepositoryImpl } from '@domains/post/repository'
@@ -237,7 +237,7 @@ commentRouter.get('/:postId', async (req: Request, res: Response) => {
  *       400:
  *         description: Returns an error that means bad request error (invalid body).
  */
-commentRouter.post('/:postId', BodyValidation(CreatePostInputDTO), async (req: Request, res: Response) => {
+commentRouter.post('/:postId', BodyValidation(CreatePostInputDTO), imagesExtensionValidation(), async (req: Request, res: Response) => {
   const { userId } = res.locals.context
   const { postId } = req.params
   const data = req.body
