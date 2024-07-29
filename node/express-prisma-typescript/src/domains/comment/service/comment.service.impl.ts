@@ -46,7 +46,7 @@ export class CommentServiceImpl implements CommentService {
     return newComment
   }
 
-  async getCommentsByUser (loggedUserId: string, userId: string): Promise<CommentDTO[]> {
+  async getCommentsByUser (loggedUserId: string, userId: string): Promise<ExtendedCommentDTO[]> {
     const user = await this.userRepo.getById(userId)
     if (!user) throw new NotFoundException('user')
     const accesibleUser = await this.validateAccesibility(loggedUserId, userId)

@@ -11,7 +11,6 @@ export class FollowServiceImpl implements FollowService {
     }
 
     const following = await this.repository.checkFollow(userId, followUserId)
-
     if (following) {
       throw new ConflictException('USER_ALREADY_FOLLOWED')
     }
@@ -23,6 +22,7 @@ export class FollowServiceImpl implements FollowService {
     if (userId === unfollowUserId) {
       throw new ConflictException('CANNOT_UNFOLLOW_YOURSELF')
     }
+
     const following = await this.repository.checkFollow(userId, unfollowUserId)
 
     if (!following) {

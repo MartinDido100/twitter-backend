@@ -1,8 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { CommentDTO, ExtendedCommentDTO } from '../dto'
 import { CommentRepository } from '.'
-import { CreatePostInputDTO } from '@domains/post/dto'
-import { PostEnum } from '@domains/post/types'
+import { CreatePostInputDTO, PostEnum } from '@domains/post/dto'
 import { CursorPagination } from '@types'
 import { ReactionEnum } from '@domains/reaction/dto'
 
@@ -22,15 +21,36 @@ export class CommentRepositoryImpl implements CommentRepository {
     return new CommentDTO(comment)
   }
 
-  async getCommentsByUser (userId: string): Promise<CommentDTO[]> {
+  async getCommentsByUser (userId: string): Promise<ExtendedCommentDTO[]> {
     const comments = await this.db.post.findMany({
       where: {
         authorId: userId,
         postType: PostEnum.COMMENT
+      },
+      include: {
+        comments: true,
+        reactions: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            profilePicture: true
+          }
+        }
       }
     })
 
-    return comments.map((comment) => new CommentDTO(comment))
+    return comments.map((comment) => {
+      const qtyLikes = comment.reactions.filter((reaction) => reaction.type === ReactionEnum.LIKE).length
+      const qtyRetweets = comment.reactions.filter((reaction) => reaction.type === ReactionEnum.RETWEET).length
+      return new ExtendedCommentDTO({
+        ...comment,
+        qtyLikes,
+        qtyRetweets,
+        qtyComments: comment.comments.length
+      })
+    })
   }
 
   async getCommentsByPost (postId: string, options: CursorPagination): Promise<ExtendedCommentDTO[]> {
@@ -43,6 +63,7 @@ export class CommentRepositoryImpl implements CommentRepository {
         postType: PostEnum.COMMENT
       },
       include: {
+        comments: true,
         reactions: true,
         author: {
           select: {
@@ -64,10 +85,17 @@ export class CommentRepositoryImpl implements CommentRepository {
         }
       ]
     })
+
     return comments.map((comment) => {
       const qtyLikes = comment.reactions.filter((reaction) => reaction.type === ReactionEnum.LIKE).length
       const qtyRetweets = comment.reactions.filter((reaction) => reaction.type === ReactionEnum.RETWEET).length
-      return new ExtendedCommentDTO({ ...comment, qtyLikes, qtyRetweets })
+      const qtyComments = comment.comments.length
+      return new ExtendedCommentDTO({
+        ...comment,
+        qtyLikes,
+        qtyRetweets,
+        qtyComments
+      })
     })
   }
 }

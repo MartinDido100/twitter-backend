@@ -16,6 +16,16 @@ export class ReactionServiceImpl implements ReactionService {
     await this.reactionRepository.like(userId, postId)
   }
 
+  async dislike (userId: string, postId: string): Promise<void> {
+    const liked = await this.reactionRepository.checkLike(userId, postId)
+
+    if (!liked) {
+      throw new ConflictException('NOT_LIKED')
+    }
+
+    await this.reactionRepository.dislike(userId, postId)
+  }
+
   async retweet (userId: string, postId: string): Promise<void> {
     const retweeted = await this.reactionRepository.checkRetweet(userId, postId)
 
@@ -34,16 +44,6 @@ export class ReactionServiceImpl implements ReactionService {
     }
 
     await this.reactionRepository.unretweet(userId, postId)
-  }
-
-  async dislike (userId: string, postId: string): Promise<void> {
-    const liked = await this.reactionRepository.checkLike(userId, postId)
-
-    if (!liked) {
-      throw new ConflictException('NOT_LIKED')
-    }
-
-    await this.reactionRepository.dislike(userId, postId)
   }
 
   async getLikes (userId: string): Promise<ReactionDTO[]> {

@@ -12,7 +12,7 @@ describe('Post service tests', () => {
   })
 
   describe('createPost method', () => {
-    it('should return a new post with no images urls', async () => {
+    it('should return a new post', async () => {
       // given
       const loggedUser = 'loggedId'
       const createdAt = new Date()
@@ -46,7 +46,7 @@ describe('Post service tests', () => {
       expect(bucketManagerMock.putImage).toHaveBeenCalledTimes(0)
     })
 
-    it('should return a new post with images urls', async () => {
+    it('should generate as urls as images are in the post', async () => {
       // given
       const loggedUser = 'loggedId'
       const createdAt = new Date()
@@ -63,23 +63,12 @@ describe('Post service tests', () => {
         createdAt
       })
 
-      bucketManagerMock.putImage.mockResolvedValue('url')
-
-      const expected: PostDTO = {
-        id: 'postId',
-        authorId: loggedUser,
-        content: input.content,
-        images: ['url', 'url'],
-        createdAt
-      }
-
       // when
-      const result = await service.createPost(loggedUser, input)
+      await service.createPost(loggedUser, input)
 
       // then
-      expect(result).toEqual(expected)
       expect(postRepositoryMock.create).toHaveBeenCalled()
-      expect(bucketManagerMock.putImage).toHaveBeenCalledTimes(expected.images.length)
+      expect(bucketManagerMock.putImage).toHaveBeenCalledTimes(2)
     })
   })
 
@@ -220,7 +209,7 @@ describe('Post service tests', () => {
       expect(bucketManagerMock.getImage).toHaveBeenCalledTimes(0)
     })
 
-    it('should generate as urls as post images has', async () => {
+    it('should generate as urls as images are in the post', async () => {
       // given
       const loggedId = 'loggedId'
       const postId = 'postId'
@@ -237,7 +226,6 @@ describe('Post service tests', () => {
 
       userRepositoryMock.isPrivateUser.mockResolvedValue(true)
       followRepositoryMock.checkFollow.mockResolvedValue(true)
-      bucketManagerMock.getImage.mockResolvedValue('url')
 
       // when
       await service.getPost(loggedId, postId)
@@ -439,7 +427,7 @@ describe('Post service tests', () => {
       expect(postRepositoryMock.getAllByDatePaginated).toHaveBeenCalled()
     })
 
-    it('should return an empty array', async () => {
+    it('should return an empty array if there are no posts', async () => {
       // given
       const loggedId = 'loggedId'
       const options = { limit: 5, after: 'afterCursorId' }
@@ -542,6 +530,149 @@ describe('Post service tests', () => {
       // then
       expect(result).toEqual(expected)
       expect(bucketManagerMock.getImage).toHaveBeenCalledTimes(6)
+      expect(postRepositoryMock.getByAuthorId).toHaveBeenCalled()
+      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalled()
+      expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
+    })
+
+    it('should generate an image url every time that a post has images or author has profile picture', async () => {
+      // given
+      const loggedId = 'loggedId'
+      const authorId = 'authorId'
+      const createdAt = new Date()
+
+      userRepositoryMock.isPrivateUser.mockResolvedValue(false)
+      bucketManagerMock.getImage.mockResolvedValue('url')
+
+      postRepositoryMock.getByAuthorId.mockResolvedValue([
+        {
+          id: 'postId',
+          authorId,
+          content: 'Post content',
+          images: ['image1.jpg', 'image2.jpg', 'image3.jpg'],
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          createdAt,
+          author: {
+            id: authorId,
+            name: 'name',
+            username: 'username',
+            profilePicture: 'profilePic1.jpg'
+          }
+        },
+        {
+          id: 'postId2',
+          authorId,
+          content: 'Post content2',
+          images: ['image1.jpg'],
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          createdAt,
+          author: {
+            id: authorId,
+            name: 'name',
+            username: 'username',
+            profilePicture: 'profilePic1.jpg'
+          }
+        }
+      ])
+
+      // when
+      await service.getPostsByAuthor(loggedId, authorId)
+
+      // then
+      expect(bucketManagerMock.getImage).toHaveBeenCalledTimes(6)
+      expect(postRepositoryMock.getByAuthorId).toHaveBeenCalled()
+      expect(userRepositoryMock.isPrivateUser).toHaveBeenCalled()
+      expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
+    })
+
+    it('should return an array of posts if author is the logged user and his profile is private', async () => {
+      // given
+      const loggedId = 'loggedId'
+      const authorId = 'loggedId'
+      const createdAt = new Date()
+
+      userRepositoryMock.isPrivateUser.mockResolvedValue(true)
+
+      postRepositoryMock.getByAuthorId.mockResolvedValue([
+        {
+          id: 'postId',
+          authorId,
+          content: 'Post content',
+          images: [],
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          createdAt,
+          author: {
+            id: authorId,
+            name: 'name',
+            username: 'username',
+            profilePicture: null
+          }
+        },
+        {
+          id: 'postId2',
+          authorId,
+          content: 'Post content2',
+          images: [],
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          createdAt,
+          author: {
+            id: authorId,
+            name: 'name',
+            username: 'username',
+            profilePicture: null
+          }
+        }
+      ])
+
+      const expected: ExtendedPostDTO[] = [
+        {
+          id: 'postId',
+          authorId,
+          content: 'Post content',
+          images: [],
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          createdAt,
+          author: {
+            id: authorId,
+            name: 'name',
+            username: 'username',
+            profilePicture: null
+          }
+        },
+        {
+          id: 'postId2',
+          authorId,
+          content: 'Post content2',
+          images: [],
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          createdAt,
+          author: {
+            id: authorId,
+            name: 'name',
+            username: 'username',
+            profilePicture: null
+          }
+        }
+      ]
+
+      // when
+      const result = await service.getPostsByAuthor(loggedId, authorId)
+
+      // then
+      expect(result).toEqual(expected)
+      expect(bucketManagerMock.getImage).toHaveBeenCalledTimes(0)
       expect(postRepositoryMock.getByAuthorId).toHaveBeenCalled()
       expect(userRepositoryMock.isPrivateUser).toHaveBeenCalled()
       expect(followRepositoryMock.checkFollow).toHaveBeenCalled()

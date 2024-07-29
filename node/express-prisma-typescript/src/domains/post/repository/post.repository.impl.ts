@@ -3,8 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import { CursorPagination } from '@types'
 
 import { PostRepository } from '.'
-import { CreatePostInputDTO, ExtendedPostDTO, PostDTO } from '../dto'
-import { PostEnum } from '../types'
+import { CreatePostInputDTO, ExtendedPostDTO, PostDTO, PostEnum } from '../dto'
 import { ReactionEnum } from '@domains/reaction/dto'
 
 export class PostRepositoryImpl implements PostRepository {
@@ -124,6 +123,7 @@ export class PostRepositoryImpl implements PostRepository {
       const qtyLikes = post.reactions.filter((reaction) => reaction.type === ReactionEnum.LIKE).length
       const qtyRetweets = post.reactions.filter((reaction) => reaction.type === ReactionEnum.RETWEET).length
       const qtyComments = post.comments.length
+
       return new ExtendedPostDTO({ ...post, qtyLikes, qtyRetweets, qtyComments })
     })
   }

@@ -1,5 +1,4 @@
-import { PostDTO } from '@domains/post/dto'
-import { UserViewDTO } from '@domains/user/dto'
+import { ExtendedPostDTO, PostDTO } from '@domains/post/dto'
 
 export class CommentDTO extends PostDTO {
   constructor (comment: CommentDTO) {
@@ -7,18 +6,14 @@ export class CommentDTO extends PostDTO {
     this.parentId = comment.parentId
   }
 
-  parentId!: string | null
+  parentId: string | null
 }
 
-export class ExtendedCommentDTO extends CommentDTO {
+export class ExtendedCommentDTO extends ExtendedPostDTO {
   constructor (comment: ExtendedCommentDTO) {
     super(comment)
-    this.qtyLikes = comment.qtyLikes
-    this.qtyRetweets = comment.qtyRetweets
-    this.author = comment.author
+    this.parentId = comment.parentId
   }
 
-  qtyLikes!: number
-  qtyRetweets!: number
-  author!: UserViewDTO
+  parentId!: string | null
 }

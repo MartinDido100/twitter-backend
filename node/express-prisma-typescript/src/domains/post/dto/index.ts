@@ -1,6 +1,11 @@
 import { ArrayMaxSize, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator'
 import { UserViewDTO } from '@domains/user/dto'
 
+export enum PostEnum {
+  POST = 'POST',
+  COMMENT = 'COMMENT',
+}
+
 export class CreatePostInputDTO {
   @IsString()
   @IsNotEmpty()

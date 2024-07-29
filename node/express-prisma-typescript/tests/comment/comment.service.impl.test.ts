@@ -238,7 +238,16 @@ describe('Comment service tests', () => {
           content: 'Comment content 1',
           images: ['image1.png', 'image2.png'],
           createdAt,
-          parentId: 'postId1'
+          parentId: 'postId1',
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author: {
+            id: userId,
+            name: 'name',
+            username: 'username',
+            profilePicture: null
+          }
         },
         {
           id: 'commentId2',
@@ -246,18 +255,36 @@ describe('Comment service tests', () => {
           content: 'Comment content 2',
           images: ['image3.jpeg'],
           createdAt,
-          parentId: 'postId2'
+          parentId: 'postId2',
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author: {
+            id: userId,
+            name: 'name',
+            username: 'username',
+            profilePicture: null
+          }
         }
       ])
 
-      const expected: CommentDTO[] = [
+      const expected: ExtendedCommentDTO[] = [
         {
           id: 'commentId1',
           authorId: userId,
           content: 'Comment content 1',
           images: ['url', 'url'],
           createdAt,
-          parentId: 'postId1'
+          parentId: 'postId1',
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author: {
+            id: userId,
+            name: 'name',
+            username: 'username',
+            profilePicture: null
+          }
         },
         {
           id: 'commentId2',
@@ -265,7 +292,16 @@ describe('Comment service tests', () => {
           content: 'Comment content 2',
           images: ['url'],
           createdAt,
-          parentId: 'postId2'
+          parentId: 'postId2',
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author: {
+            id: userId,
+            name: 'name',
+            username: 'username',
+            profilePicture: null
+          }
         }
       ]
 
@@ -302,7 +338,16 @@ describe('Comment service tests', () => {
           content: 'Comment content 1',
           images: [],
           createdAt,
-          parentId: 'postId1'
+          parentId: 'postId1',
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author: {
+            id: userId,
+            name: 'name',
+            username: 'username',
+            profilePicture: null
+          }
         },
         {
           id: 'commentId2',
@@ -310,18 +355,36 @@ describe('Comment service tests', () => {
           content: 'Comment content 2',
           images: [],
           createdAt,
-          parentId: 'postId2'
+          parentId: 'postId2',
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author: {
+            id: userId,
+            name: 'name',
+            username: 'username',
+            profilePicture: null
+          }
         }
       ])
 
-      const expected: CommentDTO[] = [
+      const expected: ExtendedCommentDTO[] = [
         {
           id: 'commentId1',
           authorId: userId,
           content: 'Comment content 1',
           images: [],
           createdAt,
-          parentId: 'postId1'
+          parentId: 'postId1',
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author: {
+            id: userId,
+            name: 'name',
+            username: 'username',
+            profilePicture: null
+          }
         },
         {
           id: 'commentId2',
@@ -329,7 +392,16 @@ describe('Comment service tests', () => {
           content: 'Comment content 2',
           images: [],
           createdAt,
-          parentId: 'postId2'
+          parentId: 'postId2',
+          qtyComments: 0,
+          qtyLikes: 0,
+          qtyRetweets: 0,
+          author: {
+            id: userId,
+            name: 'name',
+            username: 'username',
+            profilePicture: null
+          }
         }
       ]
 
@@ -429,6 +501,7 @@ describe('Comment service tests', () => {
           parentId: 'postId1',
           qtyLikes: 0,
           qtyRetweets: 0,
+          qtyComments: 0,
           author
         },
         {
@@ -440,6 +513,7 @@ describe('Comment service tests', () => {
           parentId: 'postId2',
           qtyLikes: 0,
           qtyRetweets: 0,
+          qtyComments: 0,
           author
         }
       ])
@@ -454,6 +528,7 @@ describe('Comment service tests', () => {
           parentId: 'postId1',
           qtyLikes: 0,
           qtyRetweets: 0,
+          qtyComments: 0,
           author
         },
         {
@@ -465,6 +540,7 @@ describe('Comment service tests', () => {
           parentId: 'postId2',
           qtyLikes: 0,
           qtyRetweets: 0,
+          qtyComments: 0,
           author
         }
       ]
@@ -514,6 +590,7 @@ describe('Comment service tests', () => {
           parentId: 'postId1',
           qtyLikes: 0,
           qtyRetweets: 0,
+          qtyComments: 0,
           author
         },
         {
@@ -525,6 +602,7 @@ describe('Comment service tests', () => {
           parentId: 'postId2',
           qtyLikes: 0,
           qtyRetweets: 0,
+          qtyComments: 0,
           author
         }
       ])
@@ -539,6 +617,7 @@ describe('Comment service tests', () => {
           parentId: 'postId1',
           qtyLikes: 0,
           qtyRetweets: 0,
+          qtyComments: 0,
           author
         },
         {
@@ -550,6 +629,7 @@ describe('Comment service tests', () => {
           parentId: 'postId2',
           qtyLikes: 0,
           qtyRetweets: 0,
+          qtyComments: 0,
           author
         }
       ]
@@ -599,6 +679,7 @@ describe('Comment service tests', () => {
           parentId: 'postId1',
           qtyLikes: 0,
           qtyRetweets: 0,
+          qtyComments: 0,
           author
         },
         {
@@ -610,6 +691,7 @@ describe('Comment service tests', () => {
           parentId: 'postId2',
           qtyLikes: 0,
           qtyRetweets: 0,
+          qtyComments: 0,
           author
         }
       ])

@@ -11,6 +11,5 @@ export class SendMessageInputDTO {
 
 export enum SocketEvents {
   NewMessage = 'newMessage',
-  ReceiveMessage = 'receiveMessage',
-  MessageSent = 'Message sent'
+  ReceiveMessage = 'receiveMessage'
 }
