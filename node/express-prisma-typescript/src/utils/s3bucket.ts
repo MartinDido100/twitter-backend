@@ -8,8 +8,7 @@ export class BucketManager {
   async putImage (key: string): Promise<string> {
     const putCommand = new PutObjectCommand({
       Bucket: Constants.S3_BUCKET,
-      Key: key,
-      ContentType: 'image/*'
+      Key: key
     })
 
     return await getSignedUrl(this.s3, putCommand, { expiresIn: 3600 })

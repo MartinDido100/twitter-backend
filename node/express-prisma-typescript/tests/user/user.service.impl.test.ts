@@ -33,18 +33,6 @@ describe('User service tests', () => {
       expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
     })
 
-    it('should call checkFollow', async () => {
-      // given
-      const userId = 'userId'
-      const loggedUserId = 'loggedId'
-      userRepositoryMock.getById.mockResolvedValue({ id: userId, profilePicture: null, username: 'username', name: 'name' })
-      followRepositoryMock.checkFollow.mockResolvedValue(false)
-      // when
-      await userService.getUser(loggedUserId, userId)
-      // then
-      expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
-    })
-
     it('should generate 0 url if profilePicture is null', async () => {
       // given
       const userId = 'userId'
@@ -269,6 +257,19 @@ describe('User service tests', () => {
 
       // then
       expect(bucketManagerMock.getImage).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('deleteUserMethod', () => {
+    it('should successfully delete an user', async () => {
+      // given
+      const userId = 'userId'
+
+      // when
+      await userService.deleteUser(userId)
+
+      // then
+      expect(userRepositoryMock.delete).toHaveBeenCalled()
     })
   })
 })

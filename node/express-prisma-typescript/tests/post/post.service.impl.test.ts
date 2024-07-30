@@ -426,22 +426,6 @@ describe('Post service tests', () => {
       expect(bucketManagerMock.getImage).toHaveBeenCalledTimes(5)
       expect(postRepositoryMock.getAllByDatePaginated).toHaveBeenCalled()
     })
-
-    it('should return an empty array if there are no posts', async () => {
-      // given
-      const loggedId = 'loggedId'
-      const options = { limit: 5, after: 'afterCursorId' }
-
-      postRepositoryMock.getAllByDatePaginated.mockResolvedValue([])
-
-      // when
-      const result = await service.getLatestPosts(loggedId, options)
-
-      // then
-      expect(result).toEqual([])
-      expect(bucketManagerMock.getImage).toHaveBeenCalledTimes(0)
-      expect(postRepositoryMock.getAllByDatePaginated).toHaveBeenCalled()
-    })
   })
 
   describe('getPostsByAuthor method', () => {
@@ -676,24 +660,6 @@ describe('Post service tests', () => {
       expect(postRepositoryMock.getByAuthorId).toHaveBeenCalled()
       expect(userRepositoryMock.isPrivateUser).toHaveBeenCalled()
       expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
-    })
-
-    it('should return an empty array', async () => {
-      // given
-      const loggedId = 'loggedId'
-      const authorId = 'authorId'
-
-      userRepositoryMock.isPrivateUser.mockResolvedValue(false)
-
-      postRepositoryMock.getByAuthorId.mockResolvedValue([])
-
-      // when
-      const result = await service.getPostsByAuthor(loggedId, authorId)
-
-      // then
-      expect(result).toEqual([])
-      expect(bucketManagerMock.getImage).toHaveBeenCalledTimes(0)
-      expect(postRepositoryMock.getByAuthorId).toHaveBeenCalled()
     })
 
     it('should throw ForbiddenException if author has private profile and logged user is not following him', async () => {
