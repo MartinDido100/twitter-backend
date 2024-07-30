@@ -25,8 +25,7 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+        cache: 'yarn'
     - working-directory: ./node/express-prisma-typescript
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+    - run: yarn install
+    - run: yarn test
