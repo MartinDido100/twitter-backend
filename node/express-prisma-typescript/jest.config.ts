@@ -18,7 +18,9 @@ const config: Config = {
   },
   transform: {
     '^.+\\.ts?$': 'ts-jest'
-  }
+  },
+  collectCoverageFrom: ['<rootDir>/src/domains/**/service/*.ts'],
+  coveragePathIgnorePatterns: ['<rootDir>/src/domains/socket/*']
 }
 
 export default config

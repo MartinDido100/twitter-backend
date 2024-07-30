@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator'
+import { IsNotEmpty, IsString, IsUUID, MaxLength } from 'class-validator'
 
 export class MessageDTO {
   constructor (message: MessageDTO) {
@@ -21,7 +21,6 @@ export class CreateMessageInputDTO {
   @MaxLength(40)
     content!: string
 
-  @IsString()
-  @IsNotEmpty()
+  @IsUUID()
     receiverId!: string
 }

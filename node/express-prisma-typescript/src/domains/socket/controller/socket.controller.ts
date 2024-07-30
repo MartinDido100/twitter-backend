@@ -1,4 +1,4 @@
-import { ConflictException, db, socketAuth, validateSocketInput } from '@utils'
+import { ConflictException, db, NotFoundException, socketAuth, validateSocketInput } from '@utils'
 import { Server as HttpServer } from 'node:http'
 import { Server as SocketServer } from 'socket.io'
 import { FollowRepositoryImpl } from '@domains/follow'
@@ -6,8 +6,9 @@ import { MessageRepositoryImpl } from '@domains/message'
 import { CreateMessageInputDTO } from '@domains/message/dto'
 import { SocketEvents } from '../dto'
 import { SocketServiceImpl } from '../service'
+import { UserRepositoryImpl } from '@domains/user/repository'
 
-const service = new SocketServiceImpl(new FollowRepositoryImpl(db), new MessageRepositoryImpl(db))
+const service = new SocketServiceImpl(new FollowRepositoryImpl(db), new MessageRepositoryImpl(db), new UserRepositoryImpl(db))
 
 export function socketInit (server: HttpServer): SocketServer {
   const ioServer = new SocketServer(server)
@@ -24,6 +25,11 @@ export function socketInit (server: HttpServer): SocketServer {
       }
 
       const { userId } = socket.data.context
+
+      const receiverExists = await service.checkReceiverExistance(data.receiverId)
+      if (!receiverExists) {
+        return res({ success: false, error: new NotFoundException('user') })
+      }
 
       const following = await service.checkFollows(userId, data.receiverId)
 

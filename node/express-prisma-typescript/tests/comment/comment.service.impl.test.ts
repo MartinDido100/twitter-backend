@@ -644,18 +644,12 @@ describe('Comment service tests', () => {
       expect(postRepositoryMock.getById).toHaveBeenCalled()
     })
 
-    it('should generate an image url every time a comment has', async () => {
+    it('should generate an image url every time a comment has or if the author has profile picture', async () => {
       // given
       const postId = 'postId'
       const loggedUserId = 'loggedId'
       const createdAt = new Date()
       const options = { limit: 1, after: 'afterCursorId' }
-      const author: UserViewDTO = {
-        id: 'authorId',
-        name: 'name',
-        username: 'username',
-        profilePicture: null
-      }
 
       userRepositoryMock.isPrivateUser.mockResolvedValue(true)
       followRepositoryMock.checkFollow.mockResolvedValue(true)
@@ -672,27 +666,37 @@ describe('Comment service tests', () => {
       commentRepositoryMock.getCommentsByPost.mockResolvedValue([
         {
           id: 'commentId1',
-          authorId: 'authorId',
+          authorId: 'authorId1',
           content: 'Comment content 1',
-          images: ['image.jpg'],
+          images: ['image1.jpg'],
           createdAt,
           parentId: 'postId1',
           qtyLikes: 0,
           qtyRetweets: 0,
           qtyComments: 0,
-          author
+          author: {
+            id: 'authorId1',
+            name: 'name',
+            username: 'username',
+            profilePicture: 'profilePic1.jpg'
+          }
         },
         {
           id: 'commentId2',
           authorId: 'authorId',
           content: 'Comment content 2',
-          images: ['image.jpg'],
+          images: ['image2.jpg', 'image3.jpg'],
           createdAt,
           parentId: 'postId2',
           qtyLikes: 0,
           qtyRetweets: 0,
           qtyComments: 0,
-          author
+          author: {
+            id: 'authorId2',
+            name: 'name',
+            username: 'username',
+            profilePicture: null
+          }
         }
       ])
 
@@ -701,7 +705,7 @@ describe('Comment service tests', () => {
 
       // then
       expect(userRepositoryMock.isPrivateUser).toHaveBeenCalled()
-      expect(bucketManagerMock.getImage).toHaveBeenCalledTimes(2)
+      expect(bucketManagerMock.getImage).toHaveBeenCalledTimes(4)
       expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
       expect(postRepositoryMock.getById).toHaveBeenCalled()
     })
