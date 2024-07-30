@@ -57,7 +57,7 @@ const service: AuthService = new AuthServiceImpl(new UserRepositoryImpl(db))
  *                   type: string
  *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJpYXQiOjE2MjYwNjIwNzEsImV4cCI6MTYyNjA2NTY3MX0.1"
  *       409:
- *         description: Returns an error if the user already exists.
+ *         description: Returns an error if already exists an user with that email or username.
  *         content:
  *           application/json:
  *             schema:

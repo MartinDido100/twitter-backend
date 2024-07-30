@@ -31,7 +31,7 @@ export function socketInit (server: HttpServer): SocketServer {
         return res({ success: false, error: new NotFoundException('user') })
       }
 
-      const following = await service.checkFollows(userId, data.receiverId)
+      const following = await service.checkFollowEachOther(userId, data.receiverId)
 
       if (!following) {
         return res({ success: false, error: new ConflictException('USERS_NOT_FOLLOWNG_EACHOTHER') })

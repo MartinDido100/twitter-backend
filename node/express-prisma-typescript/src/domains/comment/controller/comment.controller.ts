@@ -23,6 +23,39 @@ const commentService = new CommentServiceImpl(
  * @openapi
  * components:
  *   schemas:
+ *     ExtendedComment:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: Post id
+ *           example: "aa649330-d933-40df-b029-12c5a60a041d"
+ *         content:
+ *           type: string
+ *           description: Post content
+ *           example: "Content of the post"
+ *         authorId:
+ *           type: string
+ *           description: Author id
+ *           example: "0c498c13-ade8-4a2f-b5c3-62e6b06cf13e"
+ *         createdAt:
+ *           type: string
+ *           example: "2021-07-12T21:00:00.000Z"
+ *         updatedAt:
+ *           type: string
+ *           example: "2021-07-12T21:00:00.000Z"
+ *         images:
+ *           description: Array with presigned images urls
+ *           example: [List of urls]
+ *         qtyComments:
+ *           description: Number of comments
+ *           type: number
+ *         qtyLikes:
+ *           description: Number of likes
+ *           type: number
+ *         qtyRetweets:
+ *           description: Number of retweets
+ *           type: number
  *     Comment:
  *       type: object
  *       properties:

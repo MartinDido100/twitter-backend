@@ -19,7 +19,7 @@ export class CommentServiceImpl implements CommentService {
     const isFollowing = await this.followRepo.checkFollow(userId, otherUserId)
     const isPrivate = await this.userRepo.isPrivateUser(otherUserId)
 
-    return !isPrivate || isFollowing
+    return !isPrivate || isFollowing || userId === otherUserId
   }
 
   private async generatePutImagesUrls (images: string[]): Promise<string[]> {

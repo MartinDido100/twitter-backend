@@ -10,166 +10,84 @@ describe('Reaction service tests', () => {
     jest.resetAllMocks()
   })
 
-  describe('like method', () => {
-    it('should call like method successfully', async () => {
+  describe('reactToPost method', () => {
+    it('should create reaction succesfully method successfully', async () => {
       // given
       const loggedId = 'loggedId'
       const postId = 'postId'
 
-      reactionRepositoryMock.checkLike.mockResolvedValue(false)
+      reactionRepositoryMock.checkReaction.mockResolvedValue(false)
 
       // when
-      await service.like(loggedId, postId)
+      await service.reactToPost(loggedId, postId, ReactionEnum.LIKE)
 
       // then
-      expect(reactionRepositoryMock.like).toHaveBeenCalled()
-      expect(reactionRepositoryMock.checkLike).toHaveBeenCalled()
+      expect(reactionRepositoryMock.reactToPost).toHaveBeenCalled()
+      expect(reactionRepositoryMock.checkReaction).toHaveBeenCalled()
     })
 
-    it('should throw ConflictException if the post has already been liked', async () => {
+    it('should throw ConflictException if the post has already been reacted', async () => {
       // given
       const loggedId = 'loggedId'
       const postId = 'postId'
 
-      reactionRepositoryMock.checkLike.mockResolvedValue(true)
+      reactionRepositoryMock.checkReaction.mockResolvedValue(true)
 
       try {
         // when
-        await service.like(loggedId, postId)
+        await service.reactToPost(loggedId, postId, ReactionEnum.LIKE)
       } catch (e) {
         // then
         expect(e).toBeInstanceOf(ConflictException)
         expect(e).toMatchObject({
           message: 'Conflict',
           error: {
-            error_code: 'ALREADY_LIKED'
+            error_code: 'LIKE_ALREADY_EXISTS'
           }
         })
-        expect(reactionRepositoryMock.like).toHaveBeenCalledTimes(0)
-        expect(reactionRepositoryMock.checkLike).toHaveBeenCalled()
+        expect(reactionRepositoryMock.reactToPost).toHaveBeenCalledTimes(0)
+        expect(reactionRepositoryMock.checkReaction).toHaveBeenCalled()
       }
     })
   })
 
-  describe('dislike method', () => {
-    it('should call dislike method successfully', async () => {
+  describe('deleteReaction method', () => {
+    it('should delete reaction successfully', async () => {
       // given
       const loggedId = 'loggedId'
       const postId = 'postId'
 
-      reactionRepositoryMock.checkLike.mockResolvedValue(true)
+      reactionRepositoryMock.checkReaction.mockResolvedValue(true)
 
       // when
-      await service.dislike(loggedId, postId)
+      await service.deleteReaction(loggedId, postId, ReactionEnum.RETWEET)
 
       // then
-      expect(reactionRepositoryMock.dislike).toHaveBeenCalled()
-      expect(reactionRepositoryMock.checkLike).toHaveBeenCalled()
+      expect(reactionRepositoryMock.deleteReaction).toHaveBeenCalled()
+      expect(reactionRepositoryMock.checkReaction).toHaveBeenCalled()
     })
 
-    it('should throw ConflictException if the post has not been liked', async () => {
+    it('should throw ConflictException if the post has not been reacted', async () => {
       // given
       const loggedId = 'loggedId'
       const postId = 'postId'
 
-      reactionRepositoryMock.checkLike.mockResolvedValue(false)
+      reactionRepositoryMock.checkReaction.mockResolvedValue(false)
 
       try {
         // when
-        await service.dislike(loggedId, postId)
+        await service.deleteReaction(loggedId, postId, ReactionEnum.RETWEET)
       } catch (e) {
         // then
         expect(e).toBeInstanceOf(ConflictException)
         expect(e).toMatchObject({
           message: 'Conflict',
           error: {
-            error_code: 'NOT_LIKED'
+            error_code: 'RETWEET_NOT_EXISTS'
           }
         })
-        expect(reactionRepositoryMock.dislike).toHaveBeenCalledTimes(0)
-        expect(reactionRepositoryMock.checkLike).toHaveBeenCalled()
-      }
-    })
-  })
-
-  describe('retweet method', () => {
-    it('should call retweet method successfully', async () => {
-      // given
-      const loggedId = 'loggedId'
-      const postId = 'postId'
-
-      reactionRepositoryMock.checkRetweet.mockResolvedValue(false)
-
-      // when
-      await service.retweet(loggedId, postId)
-
-      // then
-      expect(reactionRepositoryMock.retweet).toHaveBeenCalled()
-      expect(reactionRepositoryMock.checkRetweet).toHaveBeenCalled()
-    })
-
-    it('should throw ConflictException if the post has already been retweeted', async () => {
-      // given
-      const loggedId = 'loggedId'
-      const postId = 'postId'
-
-      reactionRepositoryMock.checkRetweet.mockResolvedValue(true)
-
-      try {
-        // when
-        await service.retweet(loggedId, postId)
-      } catch (e) {
-        // then
-        expect(e).toBeInstanceOf(ConflictException)
-        expect(e).toMatchObject({
-          message: 'Conflict',
-          error: {
-            error_code: 'ALREADY_RETWEETED'
-          }
-        })
-        expect(reactionRepositoryMock.retweet).toHaveBeenCalledTimes(0)
-        expect(reactionRepositoryMock.checkRetweet).toHaveBeenCalled()
-      }
-    })
-  })
-
-  describe('unretweet method', () => {
-    it('should call unretweet method successfully', async () => {
-      // given
-      const loggedId = 'loggedId'
-      const postId = 'postId'
-
-      reactionRepositoryMock.checkRetweet.mockResolvedValue(true)
-
-      // when
-      await service.unretweet(loggedId, postId)
-
-      // then
-      expect(reactionRepositoryMock.unretweet).toHaveBeenCalled()
-      expect(reactionRepositoryMock.checkRetweet).toHaveBeenCalled()
-    })
-
-    it('should throw ConflictException if the post has not been retweeted', async () => {
-      // given
-      const loggedId = 'loggedId'
-      const postId = 'postId'
-
-      reactionRepositoryMock.checkRetweet.mockResolvedValue(false)
-
-      try {
-        // when
-        await service.unretweet(loggedId, postId)
-      } catch (e) {
-        // then
-        expect(e).toBeInstanceOf(ConflictException)
-        expect(e).toMatchObject({
-          message: 'Conflict',
-          error: {
-            error_code: 'NOT_RETWEETED'
-          }
-        })
-        expect(reactionRepositoryMock.unretweet).toHaveBeenCalledTimes(0)
-        expect(reactionRepositoryMock.checkRetweet).toHaveBeenCalled()
+        expect(reactionRepositoryMock.deleteReaction).toHaveBeenCalledTimes(0)
+        expect(reactionRepositoryMock.checkReaction).toHaveBeenCalled()
       }
     })
   })

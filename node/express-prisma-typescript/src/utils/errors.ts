@@ -36,6 +36,12 @@ export class InvalidExtensionException extends HttpException {
   }
 }
 
+export class QueryException extends HttpException {
+  constructor (errorCode?: string) {
+    super(HttpStatus.UNPROCESSABLE_ENTITY, 'Invalid provided data', { error_code: errorCode })
+  }
+}
+
 export class NotFoundException extends HttpException {
   constructor (model?: string) {
     super(HttpStatus.NOT_FOUND, `Not found.${model ? " Couldn't find " + model : ''}`)

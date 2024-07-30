@@ -1,10 +1,11 @@
-import { db } from '@utils'
+import { db, QueryException } from '@utils'
 import { Request, Response, Router } from 'express'
 import { ReactionServiceImpl } from '../service'
 import { ReactionRepositoryImpl } from '../repository'
 import httpStatus from 'http-status'
 
 import 'express-async-errors'
+import { ReactionEnum } from '../dto'
 
 export const reactionRouter = Router()
 
@@ -125,9 +126,9 @@ reactionRouter.get('/retweets/:userId', async (req: Request, res: Response) => {
 /**
  * @openapi
  *
- * /reaction/retweet/{postId}:
+ * /reaction/{postId}:
  *   post:
- *     summary: Retweets a post.
+ *     summary: Reacts to a post.
  *     tags:
  *       - Reactions
  *     security:
@@ -139,71 +140,20 @@ reactionRouter.get('/retweets/:userId', async (req: Request, res: Response) => {
  *         required: true
  *         schema:
  *           type: string
- *     responses:
- *       201:
- *         description: Tweet retweeted successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: string
- *               example: "Retweeted successfully"
- *       401:
- *         description: Returns an error if the user is not authenticated.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Unauthorized. You must login to access this content."
- *       409:
- *         description: Returns an error if the user has already retweeted the post.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Conflict"
- *                 error_code:
- *                   type: string
- *                   example: "ALREADY_RETWEETED"
- */
-reactionRouter.post('/retweet/:postId', async (req: Request, res: Response) => {
-  const { userId } = res.locals.context
-  const { postId } = req.params
-
-  await reactionService.retweet(userId, postId)
-  res.status(httpStatus.CREATED).send('Retweeted successfully')
-})
-
-/**
- * @openapi
- *
- * /reaction/like/{postId}:
- *   post:
- *     summary: Likes a post.
- *     tags:
- *       - Reactions
- *     security:
- *       - auth: []
- *     parameters:
- *       - in: path
- *         name: postId
- *         description: The id of the post to like.
+ *       - in: query
+ *         name: type
+ *         description: Reaction type, can be like or retweet.
  *         required: true
  *         schema:
  *           type: string
  *     responses:
  *       201:
- *         description: Tweet liked successfully.
+ *         description: Post reacted successfully.
  *         content:
  *           application/json:
  *             schema:
  *               type: string
- *               example: "Liked successfully"
+ *               example: "Reacted successfully"
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:
@@ -215,7 +165,20 @@ reactionRouter.post('/retweet/:postId', async (req: Request, res: Response) => {
  *                   type: string
  *                   example: "Unauthorized. You must login to access this content."
  *       409:
- *         description: Returns an error if the user has already liked the post.
+ *         description: Returns an error if the post has already reacted with that type.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid provided data"
+ *                 error_code:
+ *                   type: string
+ *                   example: "LIKE_ALREADY_EXISTS"
+ *       422:
+ *         description: Returns an error if given type is not like or retweet.
  *         content:
  *           application/json:
  *             schema:
@@ -226,22 +189,28 @@ reactionRouter.post('/retweet/:postId', async (req: Request, res: Response) => {
  *                   example: "Conflict"
  *                 error_code:
  *                   type: string
- *                   example: "ALREADY_LIKED"
+ *                   example: "INVALID_REACTION_TYPE"
  */
-reactionRouter.post('/like/:postId', async (req: Request, res: Response) => {
+reactionRouter.post('/:postId', async (req: Request, res: Response) => {
+  const { type } = req.query as Record<string, string>
   const { userId } = res.locals.context
   const { postId } = req.params
 
-  await reactionService.like(userId, postId)
-  res.status(httpStatus.CREATED).send('Liked successfully')
+  if (!type || (type.toUpperCase() !== ReactionEnum.LIKE && type.toUpperCase() !== ReactionEnum.RETWEET)) {
+    throw new QueryException('INAVLID_REACTION_TYPE')
+  }
+
+  await reactionService.reactToPost(userId, postId, type.toUpperCase() as ReactionEnum)
+
+  res.status(httpStatus.CREATED).send('Reacted successfully')
 })
 
 /**
  * @openapi
  *
- * /reaction/like/{postId}:
+ * /reaction/{postId}:
  *   delete:
- *     summary: Removes a like from a post.
+ *     summary: Deletes a reaction from a post.
  *     tags:
  *       - Reactions
  *     security:
@@ -249,18 +218,19 @@ reactionRouter.post('/like/:postId', async (req: Request, res: Response) => {
  *     parameters:
  *       - in: path
  *         name: postId
- *         description: The id of the post to remove the like.
+ *         description: The id of the post to delete reaction.
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: type
+ *         description: Reaction type, can be like or retweet.
  *         required: true
  *         schema:
  *           type: string
  *     responses:
- *       201:
- *         description: Post disliked successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: string
- *               example: "Disliked successfully"
+ *       204:
+ *         description: Post reacted successfully.
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:
@@ -272,7 +242,7 @@ reactionRouter.post('/like/:postId', async (req: Request, res: Response) => {
  *                   type: string
  *                   example: "Unauthorized. You must login to access this content."
  *       409:
- *         description: Returns an error if the user has not liked the post.
+ *         description: Returns an error if the post has not reacted with that type.
  *         content:
  *           application/json:
  *             schema:
@@ -283,43 +253,9 @@ reactionRouter.post('/like/:postId', async (req: Request, res: Response) => {
  *                   example: "Conflict"
  *                 error_code:
  *                   type: string
- *                   example: "NOT_LIKED"
- */
-reactionRouter.delete('/like/:postId', async (req: Request, res: Response) => {
-  const { userId } = res.locals.context
-  const { postId } = req.params
-
-  await reactionService.dislike(userId, postId)
-  res.status(httpStatus.CREATED).send('Disliked successfully')
-})
-
-/**
- * @openapi
- *
- * /reaction/retweet/{postId}:
- *   delete:
- *     summary: Removes a retweet from a post.
- *     tags:
- *       - Reactions
- *     security:
- *       - auth: []
- *     parameters:
- *       - in: path
- *         name: postId
- *         description: The id of the post to unretweet.
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       201:
- *         description: Post unretweeted successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: string
- *               example: "Unretweet successfully"
- *       401:
- *         description: Returns an error if the user is not authenticated.
+ *                   example: "RETWEET_NOT_EXISTS"
+ *       422:
+ *         description: Returns an error if given type is not like or retweet.
  *         content:
  *           application/json:
  *             schema:
@@ -327,25 +263,21 @@ reactionRouter.delete('/like/:postId', async (req: Request, res: Response) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Unauthorized. You must login to access this content."
- *       409:
- *         description: Returns an error if the user has not retweeted the post.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Conflict"
+ *                   example: "Invalid provided data"
  *                 error_code:
  *                   type: string
- *                   example: "NOT_RETWEETED"
+ *                   example: "INVALID_REACTION_TYPE"
  */
-reactionRouter.delete('/retweet/:postId', async (req: Request, res: Response) => {
+reactionRouter.delete('/:postId', async (req: Request, res: Response) => {
+  const { type } = req.query as Record<string, string>
   const { userId } = res.locals.context
   const { postId } = req.params
 
-  await reactionService.unretweet(userId, postId)
-  res.status(httpStatus.CREATED).send('Unretweeted successfully')
+  if (!type || (type.toUpperCase() !== ReactionEnum.LIKE && type.toUpperCase() !== ReactionEnum.RETWEET)) {
+    throw new QueryException('INAVLID_REACTION_TYPE')
+  }
+
+  await reactionService.deleteReaction(userId, postId, type.toUpperCase() as ReactionEnum)
+
+  res.status(httpStatus.NO_CONTENT)
 })

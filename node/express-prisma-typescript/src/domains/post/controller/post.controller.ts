@@ -59,6 +59,22 @@ const service: PostService = new PostServiceImpl(
  *         qtyRetweets:
  *           description: Number of retweets
  *           type: number
+ *         author:
+ *            type: object
+ *            properties:
+ *              id:
+ *                type: string
+ *                example: "1"
+ *            name:
+ *                type: string
+ *                 example: "John"
+ *            username:
+ *                type: string
+ *                example: "username"
+ *            profilePicture:
+ *                type: string
+ *                description: "AWS Presigned URL (Can be null)"
+ *                example: "AWS Presigned URL"
  *     Post:
  *       type: object
  *       properties:

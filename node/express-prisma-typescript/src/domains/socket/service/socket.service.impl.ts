@@ -15,7 +15,7 @@ export class SocketServiceImpl implements SocketService {
     return user !== null
   }
 
-  async checkFollows (userIdA: string, userIdB: string): Promise<boolean> {
+  async checkFollowEachOther (userIdA: string, userIdB: string): Promise<boolean> {
     const aFollowsB = await this.followRepo.checkFollow(userIdA, userIdB)
     const bFollowsA = await this.followRepo.checkFollow(userIdB, userIdA)
 
