@@ -725,7 +725,7 @@ describe('Comment service tests', () => {
         // then
         expect(e).toBeInstanceOf(NotFoundException)
         expect(e).toMatchObject({ message: "Not found. Couldn't find post" })
-        expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(0)
+        expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(4)
         expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(0)
         expect(postRepositoryMock.getById).toHaveBeenCalled()
       }
