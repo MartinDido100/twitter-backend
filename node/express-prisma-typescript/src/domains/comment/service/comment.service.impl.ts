@@ -3,7 +3,7 @@ import { CommentDTO, ExtendedCommentDTO } from '../dto'
 import { CommentService } from '.'
 import { CommentRepository } from '../repository'
 import { CursorPagination } from '@types'
-import { NotFoundException, ForbiddenException, BucketManager } from '@utils'
+import { NotFoundException, BucketManager } from '@utils'
 import { FollowRepository } from '@domains/follow/repository'
 import { UserRepository } from '@domains/user/repository'
 import { PostRepository } from '@domains/post/repository'
@@ -38,7 +38,7 @@ export class CommentServiceImpl implements CommentService {
 
     const accesiblePost = await this.validateAccesibility(userId, post.authorId)
 
-    if (!accesiblePost) throw new ForbiddenException()
+    if (!accesiblePost) throw new NotFoundException('post')
 
     const newComment = await this.repository.commentPost(userId, postId, body)
     newComment.images = await this.generatePutImagesUrls(newComment.images)
@@ -50,7 +50,7 @@ export class CommentServiceImpl implements CommentService {
     const user = await this.userRepo.getById(userId)
     if (!user) throw new NotFoundException('user')
     const accesibleUser = await this.validateAccesibility(loggedUserId, userId)
-    if (!accesibleUser) throw new ForbiddenException()
+    if (!accesibleUser) throw new NotFoundException('user')
 
     const comments = await this.repository.getCommentsByUser(userId)
 
@@ -65,7 +65,7 @@ export class CommentServiceImpl implements CommentService {
     const post = await this.postRepo.getById(postId)
     if (!post) throw new NotFoundException('post')
     const accesibleUser = await this.validateAccesibility(userId, post.authorId)
-    if (!accesibleUser) throw new ForbiddenException()
+    if (!accesibleUser) throw new NotFoundException('post')
     const comments = await this.repository.getCommentsByPost(postId, options)
 
     for (const comment of comments) {

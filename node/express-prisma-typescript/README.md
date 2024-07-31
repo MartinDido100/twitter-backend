@@ -142,7 +142,7 @@ Fork this repository and complete the tasks. Then create a PR and start with you
 - [x] Update `GET api/post` and `GET api/post/by_user/:user_id` to return a list of `ExtendedPostDTO`.
 - [x] Update `GET api/user/:user_id` to return `UserViewDTO`. Also return if the user follows the one making the request.
 - [x] Using [SocketIO](https://socket.io/) create an authenticated websocket to create a real-time chat between users only if they follow eachother. Also messages should be stored in the database to keep the chat history.
-- [ ] Search for a testing framework and create some unit tests. Make a CI/CD pipeline using github actions to run those tests.
+- [x] Search for a testing framework and create some unit tests. Make a CI/CD pipeline using github actions to run those tests.
 - [ ] Deploy your backend and database to a service of your preference. Here are some recommended options:
   - [Railway](https://railway.app/)
   - [Fl/](https://docs.fl0.com/)

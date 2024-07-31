@@ -6,10 +6,18 @@ import httpStatus from 'http-status'
 
 import 'express-async-errors'
 import { ReactionEnum } from '../dto'
+import { UserRepositoryImpl } from '@domains/user/repository'
+import { FollowRepositoryImpl } from '@domains/follow'
+import { PostRepositoryImpl } from '@domains/post/repository'
 
 export const reactionRouter = Router()
 
-const reactionService = new ReactionServiceImpl(new ReactionRepositoryImpl(db))
+const reactionService = new ReactionServiceImpl(
+  new ReactionRepositoryImpl(db),
+  new UserRepositoryImpl(db),
+  new FollowRepositoryImpl(db),
+  new PostRepositoryImpl(db)
+)
 
 /**
  * @openapi
@@ -33,6 +41,7 @@ const reactionService = new ReactionServiceImpl(new ReactionRepositoryImpl(db))
  *         type:
  *           type: string
  *           description: "Reaction type (Like or Retweet)"
+ *           example: LIKE or RETWEET
  */
 
 /**
@@ -61,6 +70,16 @@ const reactionService = new ReactionServiceImpl(new ReactionRepositoryImpl(db))
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Reaction'
+ *       404:
+ *         description: Returns an error if user was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Not found. Couldn't find user"
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:
@@ -105,6 +124,16 @@ reactionRouter.get('/likes/:userId', async (req: Request, res: Response) => {
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Reaction'
+ *       404:
+ *         description: Returns an error if user was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Not found. Couldn't find user"
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:
@@ -136,13 +165,13 @@ reactionRouter.get('/retweets/:userId', async (req: Request, res: Response) => {
  *     parameters:
  *       - in: path
  *         name: postId
- *         description: The id of the post to retweet.
+ *         description: The id of the post to react.
  *         required: true
  *         schema:
  *           type: string
  *       - in: query
  *         name: type
- *         description: Reaction type, can be like or retweet.
+ *         description: Reaction type, must be like or retweet.
  *         required: true
  *         schema:
  *           type: string
@@ -164,6 +193,16 @@ reactionRouter.get('/retweets/:userId', async (req: Request, res: Response) => {
  *                 message:
  *                   type: string
  *                   example: "Unauthorized. You must login to access this content."
+ *       404:
+ *         description: Returns an error if the post is unaccessible or was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Not found. Couldn't find post"
  *       409:
  *         description: Returns an error if the post has already reacted with that type.
  *         content:
@@ -173,7 +212,7 @@ reactionRouter.get('/retweets/:userId', async (req: Request, res: Response) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Invalid provided data"
+ *                   example: "Conflict"
  *                 error_code:
  *                   type: string
  *                   example: "LIKE_ALREADY_EXISTS"
@@ -186,7 +225,7 @@ reactionRouter.get('/retweets/:userId', async (req: Request, res: Response) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Conflict"
+ *                   example: "Invalid provided data"
  *                 error_code:
  *                   type: string
  *                   example: "INVALID_REACTION_TYPE"
@@ -241,6 +280,16 @@ reactionRouter.post('/:postId', async (req: Request, res: Response) => {
  *                 message:
  *                   type: string
  *                   example: "Unauthorized. You must login to access this content."
+ *       404:
+ *         description: Returns an error if the post is unaccessible or was not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Not found. Couldn't find post"
  *       409:
  *         description: Returns an error if the post has not reacted with that type.
  *         content:
@@ -279,5 +328,5 @@ reactionRouter.delete('/:postId', async (req: Request, res: Response) => {
 
   await reactionService.deleteReaction(userId, postId, type.toUpperCase() as ReactionEnum)
 
-  res.status(httpStatus.NO_CONTENT)
+  res.status(httpStatus.NO_CONTENT).send()
 })

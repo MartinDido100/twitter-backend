@@ -1,21 +1,21 @@
-import { Request, Response, Router } from 'express';
-import HttpStatus from 'http-status';
-import { MessageServiceImpl } from '../service';
-import { MessageRepositoryImpl } from '../repository';
-import { db } from '@utils';
+import { Request, Response, Router } from 'express'
+import HttpStatus from 'http-status'
+import { MessageServiceImpl } from '../service'
+import { MessageRepositoryImpl } from '../repository'
+import { db } from '@utils'
 
-import 'express-async-errors';
+import 'express-async-errors'
 
-export const messageRouter = Router();
+export const messageRouter = Router()
 
-const service = new MessageServiceImpl(new MessageRepositoryImpl(db));
+const service = new MessageServiceImpl(new MessageRepositoryImpl(db))
 
 /**
  * @openapi
  *
  * /messages/history/{userId}:
  *   get:
- *     summary: Get the history of messages between the logged user and the user with the given id.
+ *     summary: Gets the history of messages between the logged user and the user with the given id.
  *     security:
  *       - auth: []
  *     tags:
@@ -65,10 +65,10 @@ const service = new MessageServiceImpl(new MessageRepositoryImpl(db));
  *                   example: "Unauthorized. You must login to access this content."
  */
 messageRouter.get('/history/:userId', async (req: Request, res: Response) => {
-  const { userId } = res.locals.context;
-  const { userId: otherUserId } = req.params;
+  const { userId } = res.locals.context
+  const { userId: otherUserId } = req.params
 
-  const messages = await service.getHistory(userId, otherUserId);
+  const messages = await service.getHistory(userId, otherUserId)
 
-  return res.status(HttpStatus.OK).json(messages);
-});
+  return res.status(HttpStatus.OK).json(messages)
+})

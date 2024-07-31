@@ -3,7 +3,7 @@ import { bucketManagerMock, followRepositoryMock, postRepositoryMock, userReposi
 import { commentRepositoryMock } from './comment.mock'
 import { CreatePostInputDTO } from '@domains/post/dto'
 import { CommentDTO, ExtendedCommentDTO } from '@domains/comment/dto'
-import { ForbiddenException, NotFoundException } from '@utils'
+import { NotFoundException } from '@utils'
 import { UserViewDTO } from '@domains/user/dto'
 
 describe('Comment service tests', () => {
@@ -180,7 +180,7 @@ describe('Comment service tests', () => {
       }
     })
 
-    it('should throw ForbiddenExeption post author has private profile and logged user is not following the author', async () => {
+    it('should throw NotFoundException post author has private profile and logged user is not following the author', async () => {
       // given
       const userId = 'userId'
       const postId = 'postId'
@@ -205,8 +205,10 @@ describe('Comment service tests', () => {
         await service.commentPost(userId, postId, body)
       } catch (e) {
         // then
-        expect(e).toBeInstanceOf(ForbiddenException)
-        expect(e).toMatchObject({ message: 'Forbidden. You are not allowed to perform this action' })
+        expect(e).toBeInstanceOf(NotFoundException)
+        expect(e).toMatchObject({
+          message: "Not found. Couldn't find post"
+        })
         expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(1)
         expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(1)
         expect(postRepositoryMock.getById).toHaveBeenCalledTimes(1)
@@ -437,7 +439,7 @@ describe('Comment service tests', () => {
       }
     })
 
-    it('should throw ForbiddenExeption user to search has private profile and logged user is not following the author', async () => {
+    it('should throw NotFoundException user to search has private profile and logged user is not following the author', async () => {
       // given
       const userId = 'userId'
       const loggedUserId = 'loggedId'
@@ -457,8 +459,10 @@ describe('Comment service tests', () => {
         await service.getCommentsByUser(loggedUserId, userId)
       } catch (e) {
         // then
-        expect(e).toBeInstanceOf(ForbiddenException)
-        expect(e).toMatchObject({ message: 'Forbidden. You are not allowed to perform this action' })
+        expect(e).toBeInstanceOf(NotFoundException)
+        expect(e).toMatchObject({
+          message: "Not found. Couldn't find user"
+        })
         expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(1)
         expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(1)
         expect(userRepositoryMock.getById).toHaveBeenCalledTimes(1)
@@ -731,7 +735,7 @@ describe('Comment service tests', () => {
       }
     })
 
-    it('should throw ForbiddenException if author has private profile and logged user is not following him', async () => {
+    it('should throw NotFoundException if author has private profile and logged user is not following him', async () => {
       // given
       const postId = 'postId'
       const loggedUserId = 'loggedId'
@@ -753,8 +757,10 @@ describe('Comment service tests', () => {
         await service.getCommentsByPost(loggedUserId, postId, options)
       } catch (e) {
         // then
-        expect(e).toBeInstanceOf(ForbiddenException)
-        expect(e).toMatchObject({ message: 'Forbidden. You are not allowed to perform this action' })
+        expect(e).toBeInstanceOf(NotFoundException)
+        expect(e).toMatchObject({
+          message: "Not found. Couldn't find post"
+        })
         expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
         expect(userRepositoryMock.isPrivateUser).toHaveBeenCalled()
         expect(postRepositoryMock.getById).toHaveBeenCalled()

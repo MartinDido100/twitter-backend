@@ -33,7 +33,7 @@ const commentService = new CommentServiceImpl(
  *         content:
  *           type: string
  *           description: Post content
- *           example: "Content of the post"
+ *           example: "Content of the comment"
  *         authorId:
  *           type: string
  *           description: Author id
@@ -56,6 +56,22 @@ const commentService = new CommentServiceImpl(
  *         qtyRetweets:
  *           description: Number of retweets
  *           type: number
+ *         author:
+ *           type: object
+ *           properties:
+ *             id:
+ *               type: string
+ *               example: "0c498c13-ade8-4a2f-b5c3-62e6b06cf13e"
+ *             name:
+ *               type: string
+ *               example: "John"
+ *             username:
+ *               type: string
+ *               example: "username"
+ *             profilePicture:
+ *               type: string
+ *               description: "AWS Presigned URL (Can be null)"
+ *               example: "AWS Presigned URL"
  *     Comment:
  *       type: object
  *       properties:
@@ -108,9 +124,9 @@ const commentService = new CommentServiceImpl(
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Comment'
- *       403:
- *         description: Returns an error if the user has his profile in private and the requester is not following him.
+ *                 $ref: '#/components/schemas/ExtendedComment'
+ *       404:
+ *         description: Returns an error if the user was not found or is unaccessible.
  *         content:
  *           application/json:
  *             schema:
@@ -118,7 +134,7 @@ const commentService = new CommentServiceImpl(
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Forbidden. You are not allowed to perform this action"
+ *                   example: "Not found. Couldn't find user"
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:
@@ -164,9 +180,9 @@ commentRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Comment'
- *       403:
- *         description: Returns an error if the user has his profile in private and the requester is not following him.
+ *                 $ref: '#/components/schemas/ExtendedComment'
+ *       404:
+ *         description: Returns an error if the post was not found or is unaccessible.
  *         content:
  *           application/json:
  *             schema:
@@ -174,7 +190,7 @@ commentRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Forbidden. You are not allowed to perform this action"
+ *                   example: "Not found. Couldn't find post"
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:
@@ -185,16 +201,6 @@ commentRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
  *                 message:
  *                   type: string
  *                   example: "Unauthorized. You must login to access this content."
- *       404:
- *         description: Returns an error if the post is not found.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Not found. Couldn't find post"
  */
 commentRouter.get('/:postId', async (req: Request, res: Response) => {
   const { postId } = req.params
@@ -237,16 +243,6 @@ commentRouter.get('/:postId', async (req: Request, res: Response) => {
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Comment'
- *       403:
- *         description: Returns an error if the user has his profile in private and the requester is not following him.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Forbidden. You are not allowed to perform this action"
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:
@@ -258,7 +254,7 @@ commentRouter.get('/:postId', async (req: Request, res: Response) => {
  *                   type: string
  *                   example: "Unauthorized. You must login to access this content."
  *       404:
- *         description: Returns an error if the post to comment is not found.
+ *         description: Returns an error if the post was not found or is unaccessible.
  *         content:
  *           application/json:
  *             schema:

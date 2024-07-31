@@ -48,33 +48,36 @@ const service: PostService = new PostServiceImpl(
  *           type: string
  *           example: "2021-07-12T21:00:00.000Z"
  *         images:
- *           description: Array with presigned images urls
+ *           type: array
+ *           description: Array with presigned images URLs
+ *           items:
+ *             type: string
  *           example: [List of urls]
  *         qtyComments:
+ *           type: number
  *           description: Number of comments
- *           type: number
  *         qtyLikes:
+ *           type: number
  *           description: Number of likes
- *           type: number
  *         qtyRetweets:
- *           description: Number of retweets
  *           type: number
+ *           description: Number of retweets
  *         author:
- *            type: object
- *            properties:
- *              id:
- *                type: string
- *                example: "1"
- *            name:
- *                type: string
- *                 example: "John"
- *            username:
- *                type: string
- *                example: "username"
- *            profilePicture:
- *                type: string
- *                description: "AWS Presigned URL (Can be null)"
- *                example: "AWS Presigned URL"
+ *           type: object
+ *           properties:
+ *             id:
+ *               type: string
+ *               example: "0c498c13-ade8-4a2f-b5c3-62e6b06cf13e"
+ *             name:
+ *               type: string
+ *               example: "John"
+ *             username:
+ *               type: string
+ *               example: "username"
+ *             profilePicture:
+ *               type: string
+ *               description: "AWS Presigned URL (Can be null)"
+ *               example: "AWS Presigned URL"
  *     Post:
  *       type: object
  *       properties:
@@ -97,22 +100,24 @@ const service: PostService = new PostServiceImpl(
  *           type: string
  *           example: "2021-07-12T21:00:00.000Z"
  *         images:
- *           description: Array with presigned images urls
+ *           type: array
+ *           description: Array with presigned images URLs
+ *           items:
+ *             type: string
  *           example: [List of urls]
  *     CreatePostBody:
  *       type: object
  *       properties:
  *         content:
- *           description: The post content.
  *           type: string
+ *           description: The post content.
  *           example: "This is a post"
  *         images:
  *           type: array
  *           items:
  *             type: string
- *             required: false
- *             example: ["image1.jpg", "image2.png"]
- *             description: The post images, only jpg, jpeg and png extensions are allowed. Images are not required
+ *           description: The post images, only jpg, jpeg and png extensions are allowed. Images are not required
+ *           example: ["image1.jpg", "image2.png"]
  */
 
 /**
@@ -196,11 +201,9 @@ postRouter.get('/', async (req: Request, res: Response) => {
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               porperties:
  *                 $ref: '#/components/schemas/Post'
  *       404:
- *         description: Returns an error if the post is not found.
+ *         description: Returns an error if the post was not found or is unaccessible.
  *         content:
  *           application/json:
  *             schema:
@@ -209,16 +212,6 @@ postRouter.get('/', async (req: Request, res: Response) => {
  *                 message:
  *                   type: string
  *                   example: "Not found. Couldn't find post"
- *       403:
- *         description: Returns an error if the author has his profile in private and the requester is not following him.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Forbidden. You are not allowed to perform this action"
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:
@@ -265,8 +258,8 @@ postRouter.get('/:postId', async (req: Request, res: Response) => {
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/ExtendedPost'
- *       403:
- *         description: Returns an error if the user has his profile in private and the requester is not following him.
+ *       404:
+ *         description: Returns an error if the post is unaccessible.
  *         content:
  *           application/json:
  *             schema:
@@ -274,7 +267,7 @@ postRouter.get('/:postId', async (req: Request, res: Response) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Forbidden. You are not allowed to perform this action"
+ *                   example: "Not found. Couldn't find post"
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:

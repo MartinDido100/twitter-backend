@@ -52,6 +52,9 @@ export class PostRepositoryImpl implements PostRepository {
           {
             OR: [
               {
+                authorId: userId
+              },
+              {
                 author: {
                   isPrivate: false
                 }

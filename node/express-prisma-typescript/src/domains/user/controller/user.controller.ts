@@ -63,6 +63,7 @@ const service: UserService = new UserServiceImpl(new UserRepositoryImpl(db), new
  * /user:
  *   get:
  *     summary: Get logged user recommendations.
+ *     description: Returns a list of users that followed by users that logged user follows
  *     tags:
  *       - User
  *     security:
@@ -158,7 +159,7 @@ userRouter.get('/me', async (req: Request, res: Response) => {
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the user to fetch.
+ *         description: The ID of the user to get information.
  *     responses:
  *       200:
  *         description: Returns information about the given user.
@@ -309,7 +310,7 @@ userRouter.delete('/', async (req: Request, res: Response) => {
  *         description: "Extension of the image (only png, jpg, jpeg)."
  *     responses:
  *       200:
- *         description: Returns the presigned URL to upload the image.
+ *         description: Returns the presigned URL for uploading the profile picture.
  *         content:
  *           application/json:
  *             schema:
@@ -364,13 +365,8 @@ userRouter.put('/profile', async (req: Request, res: Response) => {
  *     security:
  *       - auth: []
  *     responses:
- *       200:
+ *       204:
  *         description: User successfully made public.
- *         content:
- *           application/json:
- *             schema:
- *              type: string
- *              example: "User is now public"
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:
@@ -387,7 +383,7 @@ userRouter.put('/unprivate', async (req: Request, res: Response) => {
 
   await service.unprivateUser(userId)
 
-  return res.status(HttpStatus.OK).send('User is now public')
+  return res.status(HttpStatus.NO_CONTENT).send()
 })
 
 /**
@@ -401,13 +397,8 @@ userRouter.put('/unprivate', async (req: Request, res: Response) => {
  *     security:
  *       - auth: []
  *     responses:
- *       200:
+ *       204:
  *         description: User successfully made private.
- *         content:
- *           application/json:
- *             schema:
- *              type: string
- *              example: "User is now private"
  *       401:
  *         description: Returns an error if the user is not authenticated.
  *         content:
@@ -424,5 +415,5 @@ userRouter.put('/private', async (req: Request, res: Response) => {
 
   await service.privateUser(userId)
 
-  return res.status(HttpStatus.OK).send('User is now private')
+  return res.status(HttpStatus.NO_CONTENT).send()
 })

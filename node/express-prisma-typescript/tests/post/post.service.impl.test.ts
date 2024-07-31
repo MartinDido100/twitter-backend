@@ -112,7 +112,7 @@ describe('Post service tests', () => {
       }
     })
 
-    it('should throw ForbiddenException if post author is different to logged user', async () => {
+    it('should throw NotFoundException if post author is different to logged user', async () => {
       // given
       const loggedUserId = 'loggedId'
       const postId = 'postId'
@@ -258,7 +258,7 @@ describe('Post service tests', () => {
       }
     })
 
-    it('should throw ForbiddenException if author has private profile and logged user is not following him', async () => {
+    it('should throw NotFoundException if author has private profile and logged user is not following him', async () => {
       // given
       const loggedId = 'loggedId'
       const postId = 'postId'
@@ -279,8 +279,10 @@ describe('Post service tests', () => {
         await service.getPost(loggedId, postId)
       } catch (e) {
         // then
-        expect(e).toBeInstanceOf(ForbiddenException)
-        expect(e).toMatchObject({ message: 'Forbidden. You are not allowed to perform this action' })
+        expect(e).toBeInstanceOf(NotFoundException)
+        expect(e).toMatchObject({
+          message: "Not found. Couldn't find post"
+        })
         expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(1)
         expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(1)
         expect(postRepositoryMock.getById).toHaveBeenCalled()
@@ -662,7 +664,7 @@ describe('Post service tests', () => {
       expect(followRepositoryMock.checkFollow).toHaveBeenCalled()
     })
 
-    it('should throw ForbiddenException if author has private profile and logged user is not following him', async () => {
+    it('should throw NotFoundException if author has private profile and logged user is not following him', async () => {
       // given
       const loggedId = 'loggedId'
       const postId = 'postId'
@@ -675,8 +677,10 @@ describe('Post service tests', () => {
         await service.getPostsByAuthor(loggedId, postId)
       } catch (e) {
         // then
-        expect(e).toBeInstanceOf(ForbiddenException)
-        expect(e).toMatchObject({ message: 'Forbidden. You are not allowed to perform this action' })
+        expect(e).toBeInstanceOf(NotFoundException)
+        expect(e).toMatchObject({
+          message: "Not found. Couldn't find post"
+        })
         expect(userRepositoryMock.isPrivateUser).toHaveBeenCalledTimes(1)
         expect(followRepositoryMock.checkFollow).toHaveBeenCalledTimes(1)
         expect(postRepositoryMock.getByAuthorId).toHaveBeenCalledTimes(0)
