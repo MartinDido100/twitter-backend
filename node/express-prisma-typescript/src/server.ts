@@ -20,10 +20,6 @@ if (Constants.NODE_ENV === NodeEnv.DEV) {
   app.use(morgan('tiny')) // Log requests only in development environments
 }
 
-export const sum = (num1: number, num2: number): number => {
-  return num1 + num2
-}
-
 // Set up request parsers
 app.use(express.json()) // Parses application/json payloads request bodies
 app.use(express.urlencoded({ extended: true })) // Parse application/x-www-form-urlencoded request bodies
