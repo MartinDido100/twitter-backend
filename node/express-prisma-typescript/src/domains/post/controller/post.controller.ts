@@ -291,9 +291,9 @@ postRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
 /**
  * @openapi
  *
- * /post/by_user/{userId}:
+ * /post:
  *   post:
- *     summary: Get posts by given user id.
+ *     summary: Creates a post.
  *     tags:
  *       - Posts
  *     security:
