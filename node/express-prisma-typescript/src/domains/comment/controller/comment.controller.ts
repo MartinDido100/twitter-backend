@@ -170,7 +170,7 @@ commentRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
  *         name: postId
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: ID of the post for which comments are to be fetched.
  *     responses:
  *       200:
@@ -227,7 +227,7 @@ commentRouter.get('/:postId', async (req: Request, res: Response) => {
  *         name: postId
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: ID of the post to comment on.
  *     requestBody:
  *       description: Comment body (images are optional).
