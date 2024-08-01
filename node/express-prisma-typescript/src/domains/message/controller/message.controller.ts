@@ -5,10 +5,11 @@ import { MessageRepositoryImpl } from '../repository'
 import { db } from '@utils'
 
 import 'express-async-errors'
+import { UserRepositoryImpl } from '@domains/user/repository'
 
 export const messageRouter = Router()
 
-const service = new MessageServiceImpl(new MessageRepositoryImpl(db))
+const service = new MessageServiceImpl(new MessageRepositoryImpl(db), new UserRepositoryImpl(db))
 
 /**
  * @openapi

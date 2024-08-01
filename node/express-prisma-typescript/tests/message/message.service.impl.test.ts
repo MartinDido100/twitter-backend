@@ -1,10 +1,12 @@
 import { MessageService, MessageServiceImpl } from '@domains/message'
 import { messageRepositoryMock } from './message.mock'
+import { userRepositoryMock } from '../mock'
+import { NotFoundException } from '@utils'
 
 describe('Message service tests', () => {
   let service: MessageService
   beforeEach(() => {
-    service = new MessageServiceImpl(messageRepositoryMock)
+    service = new MessageServiceImpl(messageRepositoryMock, userRepositoryMock)
     jest.resetAllMocks()
   })
 
@@ -14,6 +16,13 @@ describe('Message service tests', () => {
       const loggedId = 'loggedId'
       const otherId = 'otherId'
       const createdAt = new Date()
+
+      userRepositoryMock.getById.mockResolvedValue({
+        id: otherId,
+        username: 'username',
+        name: 'name',
+        profilePicture: null
+      })
 
       messageRepositoryMock.getMessageHistory.mockResolvedValue([
         {
@@ -57,19 +66,25 @@ describe('Message service tests', () => {
       expect(messageRepositoryMock.getMessageHistory).toHaveBeenCalled()
     })
 
-    it('should return an empty array if there are no messages', async () => {
+    it('should throw NotFoundException if user to get history does not exist', async () => {
       // given
       const loggedId = 'loggedId'
       const otherId = 'otherId'
 
-      messageRepositoryMock.getMessageHistory.mockResolvedValue([])
+      userRepositoryMock.getById.mockResolvedValue(null)
 
-      // when
-      const result = await service.getHistory(loggedId, otherId)
-
-      // then
-      expect(result).toEqual([])
-      expect(messageRepositoryMock.getMessageHistory).toHaveBeenCalled()
+      try {
+        // when
+        await service.getHistory(loggedId, otherId)
+      } catch (e) {
+        // then
+        expect(e).toBeInstanceOf(NotFoundException)
+        expect(e).toMatchObject({
+          message: "Not found. Couldn't find user"
+        })
+        expect(userRepositoryMock.getById).toHaveBeenCalled()
+        expect(messageRepositoryMock.getMessageHistory).toHaveBeenCalledTimes(0)
+      }
     })
   })
 })

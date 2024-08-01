@@ -1,4 +1,7 @@
 import swaggerJSDoc from 'swagger-jsdoc'
+import { Constants, NodeEnv } from './constants'
+
+const servers = Constants.NODE_ENV === NodeEnv.DEV ? [{ url: 'http://localhost:8080/api' }] : [{ url: 'http://localhost:8080/api' }, { url: Constants.DEPLOY_URL }]
 
 // Swagger options
 const swaggerDefinition = {
@@ -20,11 +23,7 @@ const swaggerDefinition = {
         }
       }
     },
-    servers: [
-      {
-        url: 'http://localhost:8080/api'
-      }
-    ]
+    servers
   },
   apis: ['./src/domains/**/*.controller.ts']
 }

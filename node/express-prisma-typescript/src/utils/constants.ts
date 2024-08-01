@@ -29,6 +29,9 @@ export class Constants {
   // Authentication secret
   static TOKEN_SECRET: string = process.env.TOKEN_SECRET ?? 'secret'
 
+  // Deploy url for swagger
+  static DEPLOY_URL: string = process.env.DEPLOY_URL ?? ''
+
   static S3_BUCKET: string = process.env.S3_BUCKET ?? 'bucket'
 
   static S3_REGION: string = process.env.S3_REGION ?? 'region'
