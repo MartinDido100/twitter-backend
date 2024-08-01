@@ -5,9 +5,9 @@ name: Node CI Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "deploy" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "deploy" ]
 
 jobs:
   unit-test:
