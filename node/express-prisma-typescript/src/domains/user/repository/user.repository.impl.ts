@@ -12,7 +12,8 @@ export class UserRepositoryImpl implements UserRepository {
       data: {
         email: data.email,
         username: data.username,
-        password: data.password
+        password: data.password,
+        name: data.name
       }
     })
 
