@@ -1,5 +1,6 @@
 import { ArrayMaxSize, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator'
 import { UserViewDTO } from '@domains/user/dto'
+import { ReactionDTO } from '@domains/reaction/dto'
 
 export enum PostEnum {
   POST = 'POST',
@@ -40,10 +41,12 @@ export class ExtendedPostDTO extends PostDTO {
     this.qtyComments = post.qtyComments
     this.qtyLikes = post.qtyLikes
     this.qtyRetweets = post.qtyRetweets
+    this.reactions = post.reactions
   }
 
   author!: UserViewDTO
   qtyComments!: number
   qtyLikes!: number
   qtyRetweets!: number
+  reactions!: ReactionDTO[]
 }

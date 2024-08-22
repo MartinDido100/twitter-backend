@@ -77,12 +77,11 @@ export class PostRepositoryImpl implements PostRepository {
         ]
       }
     })
-
     return posts.map((post) => {
       const qtyLikes = post.reactions.filter((reaction) => reaction.type === ReactionEnum.LIKE).length
       const qtyRetweets = post.reactions.filter((reaction) => reaction.type === ReactionEnum.RETWEET).length
       const qtyComments = post.comments.length
-      return new ExtendedPostDTO({ ...post, qtyLikes, qtyRetweets, qtyComments })
+      return new ExtendedPostDTO({ ...post, qtyLikes, qtyRetweets, qtyComments, reactions: post.reactions })
     })
   }
 
@@ -98,9 +97,29 @@ export class PostRepositoryImpl implements PostRepository {
     const post = await this.db.post.findUnique({
       where: {
         id: postId
+      },
+      include: {
+        reactions: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            profilePicture: true
+          }
+        },
+        comments: true
       }
     })
-    return post != null ? new PostDTO(post) : null
+    return post != null
+      ? new ExtendedPostDTO({
+        ...post,
+        qtyComments: post.comments.length,
+        qtyLikes: post.reactions.filter((reaction) => reaction.type === ReactionEnum.LIKE).length,
+        qtyRetweets: post.reactions.filter((reaction) => reaction.type === ReactionEnum.RETWEET).length,
+        reactions: post.reactions
+      })
+      : null
   }
 
   async getByAuthorId (authorId: string): Promise<ExtendedPostDTO[]> {
