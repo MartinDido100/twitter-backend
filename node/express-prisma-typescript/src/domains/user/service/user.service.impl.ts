@@ -31,8 +31,9 @@ export class UserServiceImpl implements UserService {
     user.profilePicture = user.profilePicture ? await this.bucketManager.getImage(user.profilePicture) : null
 
     const followsYou = await this.followRepo.checkFollow(otherUserId, loggedUserId)
+    const following = await this.followRepo.checkFollow(loggedUserId, otherUserId)
 
-    return new ExtendedUserViewDTO({ ...user, followsYou })
+    return new ExtendedUserViewDTO({ ...user, followsYou, following })
   }
 
   async getUserRecommendations (userId: any, options: OffsetPagination): Promise<UserViewDTO[]> {

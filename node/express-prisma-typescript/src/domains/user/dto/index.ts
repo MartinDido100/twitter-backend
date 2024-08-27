@@ -42,9 +42,11 @@ export class ExtendedUserViewDTO extends UserViewDTO {
   constructor (user: ExtendedUserViewDTO) {
     super(user)
     this.followsYou = user.followsYou
+    this.following = user.following
   }
 
   followsYou!: boolean
+  following!: boolean
 }
 
 export enum AllowedExtensions {
