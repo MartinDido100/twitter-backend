@@ -58,9 +58,16 @@ export class PostServiceImpl implements PostService {
     return post
   }
 
-  async getLatestPosts (userId: string, options: CursorPagination): Promise<ExtendedPostDTO[]> {
+  async getLatestPosts (userId: string, options: CursorPagination, following: string): Promise<ExtendedPostDTO[]> {
     // TODO: filter post search to return posts from authors that the user follows (DONE)
-    const posts = await this.repository.getAllByDatePaginated(options, userId)
+    let posts = await this.repository.getAllByDatePaginated(options, userId)
+
+    const usersFollowing = await this.followRepo.getFollowing(userId)
+
+    if (following !== undefined) {
+      console.log('filter')
+      posts = posts.filter(post => usersFollowing.includes(post.authorId) || post.authorId === userId)
+    }
 
     for (const post of posts) {
       post.images = await this.getImagesUrls(post.images)

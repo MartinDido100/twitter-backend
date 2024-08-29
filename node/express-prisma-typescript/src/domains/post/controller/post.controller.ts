@@ -149,6 +149,14 @@ const service: PostService = new PostServiceImpl(
  *         required: false
  *         schema:
  *           type: string
+ *       - in: param
+ *         name: query
+ *         description: Use for get only posts by following users
+ *         required: false
+ *         allowEmptyValue: true
+ *         schema:
+ *          type: "string"
+ *          example: ""
  *     responses:
  *       200:
  *         description: Returns an array of posts from authors that the user follows.
@@ -169,11 +177,12 @@ const service: PostService = new PostServiceImpl(
  *                   type: string
  *                   example: "Unauthorized. You must login to access this content."
  */
-postRouter.get('/', async (req: Request, res: Response) => {
+postRouter.get('/:query?', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
   const { limit, before, after } = req.query as Record<string, string>
+  const { query } = req.params
 
-  const posts = await service.getLatestPosts(userId, { limit: Number(limit), before, after })
+  const posts = await service.getLatestPosts(userId, { limit: Number(limit), before, after }, query)
 
   return res.status(HttpStatus.OK).json(posts)
 })

@@ -43,7 +43,7 @@ export class PostRepositoryImpl implements PostRepository {
             name: true,
             username: true,
             profilePicture: true
-          },
+          }
         },
         comments: true
       },
@@ -78,7 +78,6 @@ export class PostRepositoryImpl implements PostRepository {
       }
     })
 
-    console.log(posts)
     return posts.map((post) => {
       const qtyLikes = post.reactions.filter((reaction) => reaction.type === ReactionEnum.LIKE).length
       const qtyRetweets = post.reactions.filter((reaction) => reaction.type === ReactionEnum.RETWEET).length
