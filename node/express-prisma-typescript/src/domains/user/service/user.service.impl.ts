@@ -1,6 +1,6 @@
 import { NotFoundException } from '@utils/errors'
 import { CursorPagination, OffsetPagination } from 'types'
-import { ExtendedUserViewDTO, UserViewDTO } from '../dto'
+import { ExtendedUserViewDTO, LoggedUserViewDTO, UserViewDTO } from '../dto'
 import { UserRepository } from '../repository'
 import { UserService } from './user.service'
 import { BucketManager } from '@utils/s3bucket'
@@ -13,7 +13,7 @@ export class UserServiceImpl implements UserService {
     private readonly followRepo: FollowRepository
   ) {}
 
-  async getLoggedUser (userId: string): Promise<UserViewDTO> {
+  async getLoggedUser (userId: string): Promise<LoggedUserViewDTO> {
     const user = await this.repository.getById(userId)
     if (!user) throw new NotFoundException('user')
 
@@ -21,7 +21,9 @@ export class UserServiceImpl implements UserService {
       user.profilePicture = await this.bucketManager.getImage(user.profilePicture)
     }
 
-    return user
+    const following = await this.followRepo.getFollowing(userId)
+
+    return new LoggedUserViewDTO({ ...user, following })
   }
 
   async getUser (loggedUserId: string, otherUserId: string): Promise<ExtendedUserViewDTO> {
