@@ -65,7 +65,6 @@ export class PostServiceImpl implements PostService {
     const usersFollowing = await this.followRepo.getFollowing(userId)
 
     if (following !== undefined) {
-      console.log('filter')
       posts = posts.filter(post => usersFollowing.includes(post.authorId) || post.authorId === userId)
     }
 

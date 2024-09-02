@@ -123,7 +123,7 @@ const service: PostService = new PostServiceImpl(
 /**
  * @openapi
  *
- * /post:
+ * /post/feed:
  *   get:
  *     summary: Get the latest posts from authors that the user follows or has public profile.
  *     tags:
@@ -177,7 +177,7 @@ const service: PostService = new PostServiceImpl(
  *                   type: string
  *                   example: "Unauthorized. You must login to access this content."
  */
-postRouter.get('/:query?', async (req: Request, res: Response) => {
+postRouter.get('/feed/:query?', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
   const { limit, before, after } = req.query as Record<string, string>
   const { query } = req.params

@@ -46,7 +46,7 @@ export class UserServiceImpl implements UserService {
       user.profilePicture = user.profilePicture ? await this.bucketManager.getImage(user.profilePicture) : null
     }
 
-    return users
+    return users.filter(user => user.id !== userId);
   }
 
   async deleteUser (userId: any): Promise<void> {
