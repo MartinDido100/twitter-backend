@@ -72,7 +72,6 @@ export class PostServiceImpl implements PostService {
       post.images = await this.getImagesUrls(post.images)
       post.author.profilePicture = post.author.profilePicture ? await this.bucketManager.getImage(post.author.profilePicture) : null
     }
-
     return posts
   }
 
